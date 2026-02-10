@@ -43,6 +43,11 @@ def signin():
             return "Invalid username or password"
             
     return render_template('signin.html')
+#bugged currently
+@app.route('/dashboard')
+def dashboard():
+    user = User.query.get('user_id')
+    return render_template('dashboard.html', username=user.username)
 
 
 if __name__ == '__main__':
