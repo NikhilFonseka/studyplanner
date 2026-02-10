@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy import or_
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
@@ -32,10 +33,10 @@ def signup():
 @app.route('/signin', methods=['GET', 'POST'])
 def signin():
     if request.method == 'POST':
-        user = request.form.get('username or email')
+        login_iden = request.form.get('username or email')
         pwd = request.form.get('password')
         
-        record = User.query.filter_by(username or email =user).first()
+        record = User.query.filter(or_(User.username==login_iden, User.email == login_iden)).first()
         
 
         if record and check_password_hash(record.password_hash, pwd):
@@ -45,7 +46,7 @@ def signin():
             return "Invalid username or password"
             
     return render_template('signin.html')
-#bugged currently
+#bugged currently need to incorporate session
 @app.route('/dashboard')
 def dashboard():
     user = User.query.get('user_id')
