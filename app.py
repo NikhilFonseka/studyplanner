@@ -11,17 +11,19 @@ db = SQLAlchemy(app)
 class User(db.Model):
     user_id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
+    email = db.Column(db.String(50), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
         user = request.form.get('username')
+        emailaddress = request.form.get('email')
         pwd = request.form.get('password')
         
         hashed_pwd = generate_password_hash(pwd)
         
-        new_user = User(username=user, password_hash=hashed_pwd)
+        new_user = User(username=user,email=emailaddress, password_hash=hashed_pwd)
         db.session.add(new_user)
         db.session.commit()
         return redirect(url_for('signin'))
@@ -30,10 +32,10 @@ def signup():
 @app.route('/signin', methods=['GET', 'POST'])
 def signin():
     if request.method == 'POST':
-        user = request.form.get('username')
+        user = request.form.get('username or email')
         pwd = request.form.get('password')
         
-        record = User.query.filter_by(username=user).first()
+        record = User.query.filter_by(username or email =user).first()
         
 
         if record and check_password_hash(record.password_hash, pwd):
