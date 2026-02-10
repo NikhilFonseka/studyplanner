@@ -19,7 +19,6 @@ def signup():
         user = request.form.get('username')
         pwd = request.form.get('password')
         
-        # Turn "password123" into a secure scrambled string
         hashed_pwd = generate_password_hash(pwd)
         
         new_user = User(username=user, password_hash=hashed_pwd)
