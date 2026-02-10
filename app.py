@@ -47,7 +47,7 @@ def signin():
 @app.route('/dashboard')
 def dashboard():
     user = User.query.get('user_id')
-    return render_template('dashboard.html', username=user.username)
+    return render_template('home.html', username=user.username)
 
 
 if __name__ == '__main__':
