@@ -21,7 +21,9 @@ def signup():
         user = request.form.get('username')
         emailaddress = request.form.get('email')
         pwd = request.form.get('password')
-        
+        if not user or not emailaddress or not pwd:
+            flash("Please fill in all fields", "error")
+            return render_template('signup.html')
         hashed_pwd = generate_password_hash(pwd)
         
         new_user = User(username=user,email=emailaddress, password_hash=hashed_pwd)
