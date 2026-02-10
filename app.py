@@ -26,3 +26,26 @@ def signup():
         db.session.commit()
         return redirect(url_for('signin'))
     return render_template('signup.html')
+
+@app.route('/signin', methods=['GET', 'POST'])
+def signin():
+    if request.method == 'POST':
+        user = request.form.get('username')
+        pwd = request.form.get('password')
+        
+        record = User.query.filter_by(username=user).first()
+        
+
+        if record and check_password_hash(record.password_hash, pwd):
+            session['user_id'] = record.user_id
+            return "Login Complete"
+        else:
+            return "Invalid username or password"
+            
+    return render_template('signin.html')
+
+
+if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
+    app.run(debug=True)
