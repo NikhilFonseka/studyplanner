@@ -1,11 +1,10 @@
-from app import app, db, User
+from app import app, db, User,resetdb
 
 def run_test():
+    resetdb()
     client = app.test_client()
     #erase database
     with app.app_context():
-        db.drop_all()
-        db.create_all()
         #creates sample user
         response = client.post('/signup', data={
             'username': 'testuser',

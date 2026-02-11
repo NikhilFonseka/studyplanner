@@ -14,6 +14,7 @@ class User(db.Model):
     username = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(50), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
+    
 #controller for sign up page
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -46,11 +47,16 @@ def signin():
             return "Invalid username or password"
             
     return render_template('signin.html')
-#bugged currently need to incorporate session
 @app.route('/dashboard')
 def dashboard():
-    user = User.query.get('user_id')
-    return render_template('home.html', username=user.username)
+    user_id = session.get('user_id')
+    if user_id:
+        user = User.query.get(user_id)
+        return render_template('home.html', username=user.username)
+
+    flash("Please login to access the dashboard.")
+    return redirect(url_for('signin'))
+
 def resetdb():
     with app.app_context():
         db.drop_all()
