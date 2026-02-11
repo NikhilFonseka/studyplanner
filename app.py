@@ -19,10 +19,10 @@ class User(db.Model):
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
-        user = request.form.get('username')
-        emailaddress = request.form.get('email')
+        user = request.form.get('username').strip()
+        emailaddress = request.form.get('email').strip()
         pwd = request.form.get('password')
-        
+
         hashed_pwd = generate_password_hash(pwd)
         
         new_user = User(username=user,email=emailaddress, password_hash=hashed_pwd)
@@ -57,6 +57,11 @@ def dashboard():
     flash("Please login to access the dashboard.")
     return redirect(url_for('signin'))
 
+@app.route('/logout')
+def logout():
+    session.pop('user_id', None) 
+    flash("You have been logged out.") 
+    return redirect(url_for('signin'))
 def resetdb():
     with app.app_context():
         db.drop_all()

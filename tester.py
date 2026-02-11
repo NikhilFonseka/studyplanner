@@ -8,7 +8,7 @@ def run_test():
         #creates sample user
         response = client.post('/signup', data={
             'username': 'testuser',
-            'email': 'test',
+            'email': 'test@gmail.com',
             'password': '123'
         }, follow_redirects=True)
         
@@ -19,15 +19,27 @@ def run_test():
         else:
             print("fail")
 
+
         response = client.post('/signin', data={
-            'username or email': 'test',
-            'password': '123'
+            'username or email': 'test@gmail.com',
+            'password': 'password123'
         }, follow_redirects=True)
-        #tries to sign in using the data from the created user earlier if it works pass else it fails
-        if "Login Complete" in response.get_data(as_text=True): #need as text because data is encoded into bytes
-            print("pass")
+
+        if b"Welcome" in response.data or b"Study Planner dashboard" in response.data:
+            print("Pass (sign in successful)")
         else:
-            print("fail")
+            print("Fail (sign in not successful)")
+
+
+        fail_response = client.post('/signin', data={
+            'username or email': 'test@school.com',
+            'password': 'wrongpassword'
+        }, follow_redirects=True)
+
+        if b"Invalid username or password" in fail_response.data:
+            print("Pass (wrong password detected)")
+        else:
+            print("Fail (wrong password not detecteed)")
 #good practice to include name = main for importing
 if __name__ == '__main__':
     run_test()
