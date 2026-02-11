@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import or_
-
+#pip install flask flask_sqlalchemy werkzeug.security sqlalchemy
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -51,7 +51,11 @@ def signin():
 def dashboard():
     user = User.query.get('user_id')
     return render_template('home.html', username=user.username)
-
+def resetdb():
+    with app.app_context():
+        db.drop_all()
+        db.create_all() 
+        print("database reset")
 
 if __name__ == '__main__':
     with app.app_context():

@@ -6,7 +6,7 @@ def run_test():
     with app.app_context():
         db.drop_all()
         db.create_all()
-
+        #creates sample user
         response = client.post('/signup', data={
             'username': 'testuser',
             'email': 'test',
@@ -16,7 +16,7 @@ def run_test():
         #query is similar to select * from user checks if the user is in the database if not it fails
         user = User.query.filter_by(username='testuser').first()
         if user:
-            print("in database.")
+            print("in database")
         else:
             print("fail")
 
@@ -25,7 +25,7 @@ def run_test():
             'password': '123'
         }, follow_redirects=True)
         #tries to sign in using the data from the created user earlier if it works pass else it fails
-        if b"Login Complete" in response.data:
+        if "Login Complete" in response.get_data(as_text=True): #need as text because data is encoded into bytes
             print("pass")
         else:
             print("fail")
