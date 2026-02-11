@@ -31,10 +31,7 @@ def run_test():
             print("Fail (sign in not successful)")
 
 
-        fail_response = client.post('/signin', data={
-            'username or email': 'test@gmail.com',
-            'password': 'wrongpassword'
-        }, follow_redirects=True)
+
 
 #good practice to include name = main for importing
 if __name__ == '__main__':
