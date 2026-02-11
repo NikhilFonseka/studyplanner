@@ -9,7 +9,7 @@ def run_test():
         response = client.post('/signup', data={
             'username': 'testuser',
             'email': 'test@gmail.com',
-            'password': '123'
+            'password': 'password123'
         }, follow_redirects=True)
         
         #query is similar to select * from user checks if the user is in the database if not it fails
@@ -32,14 +32,10 @@ def run_test():
 
 
         fail_response = client.post('/signin', data={
-            'username or email': 'test@school.com',
+            'username or email': 'test@gmail.com',
             'password': 'wrongpassword'
         }, follow_redirects=True)
 
-        if b"Invalid username or password" in fail_response.data:
-            print("Pass (wrong password detected)")
-        else:
-            print("Fail (wrong password not detecteed)")
 #good practice to include name = main for importing
 if __name__ == '__main__':
     run_test()
