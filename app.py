@@ -34,7 +34,6 @@ def signin():
         login_iden = request.form.get('username or email')
         pwd = request.form.get('password')
         
-        
         record = User.query.filter(or_(User.username == login_iden, User.email == login_iden)).first()
 
         if record and check_password_hash(record.password_hash, pwd):
@@ -52,7 +51,9 @@ def logout():
 
     session.pop('user_id', None) 
     flash("You have been logged out.") 
-    return redirect(url_for('signin'))
+    redirect(url_for('signin'))
+    return render_template('signin.html')
+
 
 @app.route('/dashboard')
 def dashboard():
@@ -64,6 +65,7 @@ def dashboard():
 
     flash("Please login to access the dashboard.")
     return redirect(url_for('signin'))
+
 def resetdb():
     with app.app_context():
         db.drop_all()
