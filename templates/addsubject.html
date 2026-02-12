@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Subject - W Notes+</title>
+</head>
+<body>
+    <h2>Create a New Subject</h2>
+    <form method="POST">
+        <label>Subject Name:</label><br>
+        <input type="text" name="name" placeholder="eg Level 3 Physics" required>
+        <br><br>
+        
+        <button type="submit">Create Subject</button>
+        <a href="{{ url_for('dashboard') }}">Cancel</a>
+    </form>
+</body>
+</html>

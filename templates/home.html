@@ -26,6 +26,7 @@
     <section>
         <h3>Your Subjects</h3>
         <a href="{{ url_for('add_subject') }}">+ Create New Subject</a>
+        <a href="{{ url_for('add_task') }}">+ New Task</a> |
         
         <ul>
             {% for sub in subjects %}

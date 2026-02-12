@@ -31,6 +31,10 @@ class Task(db.Model):
     is_completed = db.Column(db.Boolean, default=False)
     subject_id = db.Column(db.Integer, db.ForeignKey('subject.subject_id'), nullable=False)
 
+@app.route('/')
+def index():
+    # auto redirects to signin page when the default site http://127.0.0.1:5000 is visited
+    return redirect(url_for('signin'))
 #controller for sign up page
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -95,9 +99,8 @@ def add_subject():
         db.session.commit()
         return redirect(url_for('dashboard'))
     
-    return render_template('add_subject.html')
+    return render_template('addsubject.html')
 #add task controller
-
 @app.route('/add_task', methods=['GET', 'POST'])
 def add_task():
     if 'user_id' not in session:

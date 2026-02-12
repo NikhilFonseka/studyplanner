@@ -1,4 +1,5 @@
 <h2>Tasks for {{ subject.name }}</h2>
+<a href="{{ url_for('add_task') }}?subject_id={{ subject.subject_id }}">+ Add Task to this Subject</a>
 <ul>
     {% for task in subject.tasks %}
         <li>
