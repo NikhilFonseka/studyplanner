@@ -7,13 +7,12 @@
     <h1>W Notes+</h1>
     <h2>Welcome, {{ username }}!</h2>
     <p>This is your Study Planner dashboard.</p>
-    
     <hr>
     <h3>Your Tools:</h3>
     <ul>
         <li><a href="/add_task">Add a New Task</a></li>
         <li><a href="/view_notes">View My Notes</a></li>
-        <li><a href="/logout">Logout</a></li>
+        <li><a href="{{ url_for('logout') }}">Logout</a></li>
     </ul>
 </body>
 </html>
