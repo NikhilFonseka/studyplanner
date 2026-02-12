@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import or_
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
@@ -61,26 +62,59 @@ def signin():
             return render_template('signin.html')
             
     return render_template('signin.html')
-
+#controller for logout
 @app.route('/logout')
 def logout():
-
-    session.pop('user_id', None) 
+    session.clear() 
     flash("You have been logged out.") 
-    redirect(url_for('signin'))
-    return render_template('signin.html')
+    return redirect(url_for('signin'))
 
-
+#controller for dashboard
 @app.route('/dashboard')
 def dashboard():
+    #checks if user id is the sessions pool, if not kick the userout to prevent unauthroized access
     user_id = session.get('user_id')
     if user_id:
- 
         user = db.session.get(User, user_id) 
-        return render_template('home.html', username=user.username)
-
+        user_subs = Subject.query.filter_by(user_id=user_id).all()
+        return render_template('home.html', username=user.username, subjects=user_subs)
     flash("Please login to access the dashboard.")
     return redirect(url_for('signin'))
+#add subject controller
+@app.route('/add_subject', methods=['GET', 'POST'])
+def add_subject():
+    if 'user_id' not in session:
+        return redirect(url_for('signin'))
+    
+    if request.method == 'POST':
+        name = request.form.get('name')
+        color = request.form.get('color')
+        new_sub = Subject(name=name, color_tag=color, user_id=session['user_id'])
+        db.session.add(new_sub)
+        db.session.commit()
+        return redirect(url_for('dashboard'))
+    
+    return render_template('add_subject.html')
+#add task controller
+@app.route('/add_task', methods=['GET', 'POST'])
+def add_task():
+    if 'user_id' not in session:
+        return redirect(url_for('signin'))
+    
+    user_subjects = Subject.query.filter_by(user_id=session['user_id']).all()
+
+    if request.method == 'POST':
+        title = request.form.get('title')
+        due_date_str = request.form.get('due_date')
+        sub_id = request.form.get('subject_id')
+        due_date = datetime.strptime(due_date_str, '%Y-%m-%d') if due_date_str else None
+        
+        new_task = Task(title=title, due_date=due_date, subject_id=sub_id)
+        db.session.add(new_task)
+        db.session.commit()
+        return redirect(url_for('dashboard'))
+
+    return render_template('add_task.html', subjects=user_subjects)
 
 def resetdb():
     with app.app_context():

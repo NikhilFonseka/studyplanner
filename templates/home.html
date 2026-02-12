@@ -1,18 +1,42 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Home</title>
+    <title>Dashboard - W Notes+</title>
 </head>
 <body>
-    <h1>W Notes+</h1>
-    <h2>Welcome, {{ username }}!</h2>
-    <p>This is your Study Planner dashboard.</p>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+          <p style="color: blue;">{{ message }}</p>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <header>
+        <h1>W Notes+</h1>
+        <p>Logged in as: <strong>{{ username }}</strong></p>
+        <nav>
+            <a href="{{ url_for('dashboard') }}">Home</a> | 
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </nav>
+    </header>
+
     <hr>
-    <h3>Your Tools:</h3>
-    <ul>
-        <li><a href="/add_task">Add a New Task</a></li>
-        <li><a href="/view_notes">View My Notes</a></li>
-        <li><a href="{{ url_for('logout') }}">Logout</a></li>
-    </ul>
+
+    <section>
+        <h3>Your Subjects</h3>
+        <a href="{{ url_for('add_subject') }}">+ Create New Subject</a>
+        
+        <ul>
+            {% for sub in subjects %}
+                <li>
+                    <strong>{{ sub.name }}</strong> 
+                    <a href="/subject/{{ sub.subject_id }}">View Tasks</a>
+                </li>
+            {% else %}
+                <p>You haven't added any subjects yet.</p>
+            {% endfor %}
+        </ul>
+    </section>
 </body>
 </html>
