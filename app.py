@@ -80,6 +80,7 @@ def dashboard():
         return render_template('home.html', username=user.username, subjects=user_subs)
     flash("Please login to access the dashboard.")
     return redirect(url_for('signin'))
+
 #add subject controller
 @app.route('/add_subject', methods=['GET', 'POST'])
 def add_subject():
@@ -96,6 +97,7 @@ def add_subject():
     
     return render_template('add_subject.html')
 #add task controller
+
 @app.route('/add_task', methods=['GET', 'POST'])
 def add_task():
     if 'user_id' not in session:
@@ -113,9 +115,36 @@ def add_task():
         db.session.add(new_task)
         db.session.commit()
         return redirect(url_for('dashboard'))
+    return render_template('addtask.html', subjects=user_subjects)
 
-    return render_template('add_task.html', subjects=user_subjects)
+#viewsubject controller
+@app.route('/subject/<int:subject_id>')
+def view_subject(subject_id):
+    if 'user_id' not in session:
+        return redirect(url_for('signin'))
+    #data secruity
+    subject = Subject.query.filter_by(subject_id=subject_id, user_id=session['user_id']).first_or_404()
+    return render_template('viewsubject.html', subject=subject)
 
+#completed task controller
+@app.route('/complete_task/<int:task_id>')
+def complete_task(task_id):
+    task = Task.query.get_or_404(task_id)
+    if task.subject.user_id == session.get('user_id'):
+        task.is_completed = not task.is_completed  # mark as complete or not
+        db.session.commit()
+    return redirect(request.referrer or url_for('dashboard'))
+
+#subject delete controller
+@app.route('/delete_subject/<int:subject_id>')
+def delete_subject(subject_id):
+    subject = Subject.query.filter_by(subject_id=subject_id, user_id=session['user_id']).first_or_404()
+    db.session.delete(subject)
+    db.session.commit()
+    flash(f"Subject '{subject.name}' deleted.")
+    return redirect(url_for('dashboard'))
+
+#for when I need to reset db for testing purposes will not be used in the finished product but useful feature
 def resetdb():
     with app.app_context():
         db.drop_all()

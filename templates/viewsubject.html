@@ -1,0 +1,11 @@
+<h2>Tasks for {{ subject.name }}</h2>
+<ul>
+    {% for task in subject.tasks %}
+        <li>
+            {{ task.title }} - 
+            Due: {{ task.due_date.strftime('%Y-%m-%d') if task.due_date else 'No Date' }}
+            {% if task.is_completed %} ✅ {% else %} ⏳ {% endif %}
+        </li>
+    {% endfor %}
+</ul>
+<a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
