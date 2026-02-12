@@ -14,6 +14,22 @@ class User(db.Model):
     username = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(50), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
+
+#subjects table
+class Subject(db.Model):
+    subject_id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False)
+    color_tag = db.Column(db.String(20)) 
+    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=False)
+    tasks = db.relationship('Task', backref='subject', lazy=True)
+#tasks table
+class Task(db.Model):
+    task_id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(50), nullable=False)
+    due_date = db.Column(db.DateTime, nullable=True)
+    is_completed = db.Column(db.Boolean, default=False)
+    subject_id = db.Column(db.Integer, db.ForeignKey('subject.subject_id'), nullable=False)
+
 #controller for sign up page
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
