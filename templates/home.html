@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Dashboard - W Notes+</title>
 </head>
 <body>
@@ -24,20 +25,22 @@
     <hr>
 
     <section>
-        <h3>Your Subjects</h3>
-        <a href="{{ url_for('add_subject') }}">+ Create New Subject</a>
-        <a href="{{ url_for('add_task') }}">+ New Task</a> |
+        <h2>Your Subjects</h2>
+        <a href="{{ url_for('add_subject') }}">+ Create New Subject</a> |
+        <a href="{{ url_for('add_task') }}">+ New Task</a>
         
-        <ul>
-            {% for sub in subjects %}
-                <li>
-                    <strong>{{ sub.name }}</strong> 
-                    <a href="/subject/{{ sub.subject_id }}">View Tasks</a>
-                </li>
-            {% else %}
-                <p>You haven't added any subjects yet.</p>
-            {% endfor %}
-        </ul>
+        {% if subjects %}
+            <ul>
+                {% for sub in subjects %}
+                    <li>
+                        <strong>{{ sub.name }}</strong> 
+                        <a href="{{ url_for('view_subject', subject_id=sub.subject_id) }}">View Tasks</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>You haven't added any subjects yet.</p>
+        {% endif %}
     </section>
 </body>
 </html>

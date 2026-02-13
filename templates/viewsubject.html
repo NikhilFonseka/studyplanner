@@ -5,7 +5,7 @@
         <li>
             {{ task.title }} - 
             Due: {{ task.due_date.strftime('%Y-%m-%d') if task.due_date else 'No Date' }}
-            {% if task.is_completed %} ✅ {% else %} ⏳ {% endif %}
+            {% if task.is_completed %} Task complete {% else %} {% endif %}
         </li>
     {% endfor %}
 </ul>

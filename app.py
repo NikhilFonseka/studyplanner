@@ -40,10 +40,10 @@ def index():
 def signup():
     if request.method == 'POST':
         user = request.form.get('username')
-        emailaddress = request.form.get('email')
-        pwd = request.form.get('password')
-        hashed_pwd = generate_password_hash(pwd)
-        new_user = User(username=user, email=emailaddress, password_hash=hashed_pwd)
+        email = request.form.get('email')
+        password = request.form.get('password')
+        hashed_password = generate_password_hash(password)
+        new_user = User(username=user, email=email, password_hash=hashed_password)
         db.session.add(new_user)
         db.session.commit()
         return redirect(url_for('signin'))
