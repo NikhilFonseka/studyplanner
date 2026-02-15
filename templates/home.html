@@ -1,45 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Dashboard - W Notes+</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>W Notes+ Dashboard</title>
 </head>
-<body>
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        {% for message in messages %}
-          <p style="color: blue;">{{ message }}</p>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
+<body class="dashboard_container">
+    <nav class="top_nav">
+        <h1 class="main_title">W Notes+</h1>
+        <p>Welcome <strong>{{ username}} </strong>!</p>
+        <a href="/logout" class="button_signup" style="width: 100px;">Logout</a>
+    </nav>
 
-    <header>
-        <h1>W Notes+</h1>
-        <p>Logged in as: <strong>{{ username }}</strong></p>
-        <nav>
-            <a href="{{ url_for('dashboard') }}">Home</a> 
-            <a href="{{ url_for('logout') }}">Logout</a>
-        </nav>
-    </header>
-
-
-    <section>
+    <main>
         <h2>Your Subjects</h2>
-        <a href="{{ url_for('add_subject') }}">+ Create New Subject</a> 
-        <a href="{{ url_for('add_task') }}">+ New Task</a>
         
-        {% if subjects %}
-            <ul>
-                {% for sub in subjects %}
-                    <li>
-                        <strong>{{ sub.name }}</strong> 
-                        <a href="{{ url_for('view_subject', subject_id=sub.subject_id) }}">View Tasks</a>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>You haven't added any subjects yet.</p>
-        {% endif %}
-    </section>
+        <div class="signup_row">
+            <a href="/add_subject" class="button_signup">Add New Subject</a>
+            <a href="/add_task" class="button_signup">Add New Task</a>
+        </div>
+
+        <ul class="subject_list">
+            {% for subject in subjects %}
+            <li>
+                <a href="{{ url_for('view_subject', subject_id=subject.subject_id) }}" class="subject_card">
+                    {{ subject.name }}
+                </a>
+            </li>
+            {% else %}
+            <p>No subjects yet. Click "Add New Subject" to start!</p>
+            {% endfor %}
+        </ul>
+    </main>
 </body>
 </html>

@@ -51,9 +51,12 @@ class Subject(db.Model):
 class Task(db.Model):
     task_id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(50), nullable=False)
-    due_date = db.Column(db.DateTime, nullable=True)
-    is_completed = db.Column(db.Boolean, default=False)
+    due_date = db.Column(db.DateTime)
     subject_id = db.Column(db.Integer, db.ForeignKey('subject.subject_id'), nullable=False)
+
+class Tag(db.Model):
+    tag_id = db.Column(db.Integer, primary_key=True)
+    tag_name = db.Column(db.String(20), nullable=False)
 
 @app.route('/')
 def index():
