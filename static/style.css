@@ -1,0 +1,54 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column; /* stacks vertically */
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #ffffff;
+    text-align: center;
+}
+
+.main_title {
+    color: #ff7543; 
+    font-size: 40px;
+    margin-bottom: 25px;
+}
+
+/* Applying styles directly to inputs */
+input.input_group {
+    display: block;
+    width: 300px;
+    padding: 15px;
+    margin: 10px auto;
+    border: 1px solid #a9a9a9;
+    font-size: 18px;
+}
+
+.button_login {
+    background-color: #444;
+    color: #ffffff; 
+    border: none;
+    padding: 15px;
+    font-size: 20px;
+    border-radius: 8px;
+    width: 330px; /* matches input width + padding */
+    cursor: pointer;
+}
+
+.signup_row {
+    margin-top: 20px;
+    font-size: 16px; 
+    color: #555;
+}
+
+.button_signup {
+    background-color: #444; 
+    color: #ffffff; 
+    padding: 5px 15px;
+    text-decoration: none; 
+    border-radius: 4px;
+    font-size: 14px;
+    margin-left: 10px;
+}

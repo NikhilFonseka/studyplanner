@@ -1,25 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
-{% with messages = get_flashed_messages() %}
-  {% if messages %}
-    <div class="flash-messages">
-      {% for message in messages %}
-        <p style="color: red; font-weight: bold;">{{ message }}</p>
-      {% endfor %}
-    </div>
-  {% endif %}
-{% endwith %}
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>W Notes+ Login</title>
+</head>
+<body class="login_container">
+    <h1 class="main_title">W Notes+</h1>
+    
+    <form method="POST" action="/signin">
+        <input type="text" name="username or email" placeholder="Username or Email" class="input_group" required>
+        <input type="password" name="password" placeholder="Password" class="input_group" required>
 
-<form action="/signin" method="POST">
+        <button type="submit" class="button_login">Login</button>
+        
+        <div class="signup_row">
+            <a href="/signup" class="button_signup">Sign up instead</a>
+        </div>
     </form>
-<form method="POST">
-    <h2>Sign in</h2>
-    <input type="text" name="username or email" placeholder="Username or Email" required> <!-- sign in with username or email -->
-    <input type="password" name="password" placeholder="Password" required>
-    <button type="submit">Login</button>
-    <p>Don't have an account?</p>
-    <a href="{{ url_for('signup') }}">
-        <button type="button">Sign Up Here</button>
-    </a>
-</form>
+</body>
 </html>
