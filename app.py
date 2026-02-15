@@ -3,12 +3,36 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import or_
 from datetime import datetime
+from jinja2 import Environment, FileSystemLoader, exceptions
+import os 
+import sys
+#if there is an issue with templates the program never runs, error prevention found from stack overflow https://stackoverflow.com/questions/37939131/how-to-validate-jinja-syntax-without-variable-interpolation
+def validate_templates():
+   
+    template_dir = os.path.join(os.path.dirname(__file__), 'templates')
+    env = Environment(loader=FileSystemLoader(template_dir))
+    
+    templates = [x for x in env.list_templates() if x.endswith('.html')]
 
+    errors = 0
+    for template in templates:
+        try:
+            env.get_template(template)
+        except exceptions.TemplateSyntaxError as e:
+            errors += 1
+            
+    if errors > 0:
+        print(f"Validation failed with {errors} errors.")
+        sys.exit()
+    else:
+        pass
+        
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = "W_notes+"
 db = SQLAlchemy(app)
+app.secret_key = 'readingthiskeys'
 #user table
 class User(db.Model):
     user_id = db.Column(db.Integer, primary_key=True)
@@ -40,10 +64,10 @@ def index():
 def signup():
     if request.method == 'POST':
         user = request.form.get('username')
-        email = request.form.get('email')
+        emailaddress = request.form.get('email')
         password = request.form.get('password')
         hashed_password = generate_password_hash(password)
-        new_user = User(username=user, email=email, password_hash=hashed_password)
+        new_user = User(username=user, email=emailaddress, password_hash=hashed_password)
         db.session.add(new_user)
         db.session.commit()
         return redirect(url_for('signin'))
@@ -58,11 +82,12 @@ def signin():
         record = User.query.filter(or_(User.username == login_iden, User.email == login_iden)).first()
 
         if record and check_password_hash(record.password_hash, pwd):
+            #adds user to session
             session['user_id'] = record.user_id
 
             return redirect(url_for('dashboard')) 
         else:
-            flash("Invalid username or password")
+            flash("Invalid credentials")
             return render_template('signin.html')
             
     return render_template('signin.html')
@@ -154,6 +179,8 @@ def resetdb():
         db.create_all()
         print("database reset")
 if __name__ == '__main__':
+    validate_templates()
     with app.app_context():
         db.create_all()
     app.run(debug=True)
+

@@ -17,16 +17,15 @@
         <h1>W Notes+</h1>
         <p>Logged in as: <strong>{{ username }}</strong></p>
         <nav>
-            <a href="{{ url_for('dashboard') }}">Home</a> | 
+            <a href="{{ url_for('dashboard') }}">Home</a> 
             <a href="{{ url_for('logout') }}">Logout</a>
         </nav>
     </header>
 
-    <hr>
 
     <section>
         <h2>Your Subjects</h2>
-        <a href="{{ url_for('add_subject') }}">+ Create New Subject</a> |
+        <a href="{{ url_for('add_subject') }}">+ Create New Subject</a> 
         <a href="{{ url_for('add_task') }}">+ New Task</a>
         
         {% if subjects %}
