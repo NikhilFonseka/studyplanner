@@ -4,7 +4,7 @@ import pytest
 
 def run_test():
     resetdb()
- 
+#tests signing in into the site
     client = app.test_client()
     
     with app.app_context():
@@ -33,7 +33,7 @@ def run_test():
             print("Pass (signin successful and redirected to Dashboard)")
         else:
             print("Fail (Login failed or didn't reach dashboard)")
-            # Log a of the response to see what happened
+            #log a of the response to see what happened
             print(f"response code {response.status_code}")
 
 @pytest.fixture
@@ -50,24 +50,27 @@ def client():
         yield client
 
 def test_dashboard_access(client):
-    """Proves the dashboard loads for a logged in user"""
+    #Proves the dashboard loads for a logged in user
     client.post('/signin', data={'username or email': 'test@gmail.com', 'password': 'password123'}, follow_redirects=True)
     rv = client.get('/dashboard')
     assert rv.status_code == 200
     assert b"W Notes+" in rv.data
 
 def test_navigation_links(client):
-    """Proves url_for rendered real paths (Fixes your validator errors)"""
+    #proves all links are functional
     client.post('/signin', data={'username or email': 'test@gmail.com', 'password': 'password123'}, follow_redirects=True)
     rv = client.get('/dashboard')
     assert b'href="/logout"' in rv.data
-    assert b'href="/dashboard"' in rv.data
+    # Look for these instead:
+    assert b'href="/add_subject"' in rv.data
+    assert b'href="/add_task"' in rv.data
 
 def test_empty_subjects_message(client):
-    """Proves HTML logic: shows message when list is empty"""
     client.post('/signin', data={'username or email': 'test@gmail.com', 'password': 'password123'}, follow_redirects=True)
     rv = client.get('/dashboard')
-    assert b"You haven't added any subjects yet." in rv.data
+    assert b'No subjects yet. Click "Add New Subject" to start!' in rv.data
+
+
 
 if __name__ == '__main__':
     run_test()

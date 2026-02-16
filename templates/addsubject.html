@@ -1,17 +1,26 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <title>Add Subject - W Notes+</title>
 </head>
-<body>
-    <h2>Create a New Subject</h2>
-    <form method="POST">
-        <label>Subject Name:</label><br>
-        <input type="text" name="name" required>
-        <br><br>
-        
-        <button type="submit">Create Subject</button>
-        <a href="{{ url_for('dashboard') }}">Cancel</a>
-    </form>
+<body class="dashboard-body">
+    <header class="home-header">
+        <h1 class="main_title">W Notes+</h1>
+    </header>
+
+    <main class="home-content">
+        <h2>Create New Subject</h2>
+        <form method="POST" action="/add_subject">
+            <input type="text" name="name" placeholder="Subject Name (e.g. Math)" class="input_group" required>
+            <input type="text" name="color" placeholder="Color Tag (e.g. #ff7543)" class="input_group">
+            
+            <button type="submit" class="button_login">Save Subject</button>
+            <div class="signup_row">
+                <a href="/dashboard" class="button_signup">Back to Dashboard</a>
+            </div>
+        </form>
+
+    </main>
 </body>
 </html>

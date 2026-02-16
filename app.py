@@ -140,7 +140,12 @@ def add_task():
         title = request.form.get('title')
         due_date_str = request.form.get('due_date')
         sub_id = request.form.get('subject_id')
-        due_date = datetime.strptime(due_date_str, '%Y-%m-%d') if due_date_str else None
+        due_date = None
+        if due_date_str and due_date_str.strip():
+            try:
+                due_date = datetime.strptime(due_date_str, '%Y-%m-%d')
+            except ValueError:
+                due_date = None 
         
         new_task = Task(title=title, due_date=due_date, subject_id=sub_id)
         db.session.add(new_task)

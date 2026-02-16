@@ -1,16 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
-<form method="POST">
-    <input type="text" name="title" placeholder="Task Title" required>
-    <input type="date" name="due_date">
-    
-    <select name="subject_id" required>
-        <option value="">Select a Subject</option>
-        {% for sub in subjects %}
-            <option value="{{ sub.subject_id }}">{{ sub.name }}</option>
-        {% endfor %}
-    </select>
-    
-    <button type="submit">Add Task</button>
-</form>
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Add Task - W Notes+</title>
+</head>
+<body class="dashboard-body">
+    <header class="home-header">
+        <h1 class="main_title">W Notes+</h1>
+    </header>
+
+    <main class="home-content">
+        <h2>Add New Task</h2>
+        <form method="POST" action="/add_task">
+            <input type="text" name="title" placeholder="What needs to be done?" class="input_group" required>
+            <input type="date" name="due_date" class="input_group">
+            
+            <select name="subject_id" class="input_group" required style="width: 320px; padding: 15px; background: white;">
+                <option value="" disabled selected>Select a Subject</option>
+                {% for subject in subjects %}
+                <option value="{{ subject.subject_id }}">{{ subject.name }}</option>
+                {% endfor %}
+            </select>
+
+            <button type="submit" class="button_login">Create Task</button>
+            <div class="signup_row">
+                <a href="/dashboard" class="button_signup">Back to Dashboard</a>
+            </div>
+        </form>
+    </main>
+</body>
 </html>
