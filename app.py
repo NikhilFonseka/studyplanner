@@ -81,17 +81,15 @@ def signin():
     if request.method == 'POST':
         login_iden = request.form.get('username or email')
         pwd = request.form.get('password')
-        
         record = User.query.filter(or_(User.username == login_iden, User.email == login_iden)).first()
 
         if record and check_password_hash(record.password_hash, pwd):
-            #adds user to session
             session['user_id'] = record.user_id
-
             return redirect(url_for('dashboard')) 
         else:
             flash("Invalid credentials")
-            return render_template('signin.html')
+            # 401 indicates the authentication failed
+            return render_template('signin.html'), 401 
             
     return render_template('signin.html')
 #controller for logout
@@ -158,8 +156,13 @@ def add_task():
 def view_subject(subject_id):
     if 'user_id' not in session:
         return redirect(url_for('signin'))
-    #data secruity
-    subject = Subject.query.filter_by(subject_id=subject_id, user_id=session['user_id']).first_or_404()
+    
+    subject = Subject.query.filter_by(subject_id=subject_id, user_id=session['user_id']).first()
+    
+    if not subject:
+        # 403 "known user unauthroized access"
+        return "Unauthorized Access", 403
+        
     return render_template('viewsubject.html', subject=subject)
 
 #completed task controller

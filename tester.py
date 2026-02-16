@@ -65,10 +65,37 @@ def test_navigation_links(client):
     assert b'href="/add_subject"' in rv.data
     assert b'href="/add_task"' in rv.data
 
-def test_empty_subjects_message(client):
+def test_add_subject(client):
+    """Tests if a user can successfully create a subject"""
     client.post('/signin', data={'username or email': 'test@gmail.com', 'password': 'password123'}, follow_redirects=True)
-    rv = client.get('/dashboard')
-    assert b'No subjects yet. Click "Add New Subject" to start!' in rv.data
+    
+    # Post new subject data
+    rv = client.post('/add_subject', data={
+        'name': 'Computing',
+        'color': '#ff7543'
+    }, follow_redirects=True)
+    
+    assert rv.status_code == 200
+    assert b"Computing" in rv.data
+
+
+def test_unauthorized_subject_access(client):
+    """Proves a user cannot see another user's subject"""
+    # Create a subject belonging to User #99 (not the test user)
+    with app.app_context():
+        from app import Subject, db
+        enemy_sub = Subject(name="Secret Info", user_id=99)
+        db.session.add(enemy_sub)
+        db.session.commit()
+        enemy_id = enemy_sub.subject_id
+
+    # access it while logged in as 'testuser'
+    client.post('/signin', data={'username or email': 'test@gmail.com', 'password': 'password123'}, follow_redirects=True)
+    rv = client.get(f'/subject/{enemy_id}')
+    
+
+    assert rv.status_code == 403
+
 
 
 
