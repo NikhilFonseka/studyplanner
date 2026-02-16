@@ -1,15 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
-<h2>Tasks for {{ subject.name }}</h2>
-<a href="{{ url_for('add_task') }}?subject_id={{ subject.subject_id }}">+ Add Task to this Subject</a>
-<ul>
-    {% for task in subject.tasks %}
-        <li>
-            {{ task.title }} - 
-            Due: {{ task.due_date.strftime('%Y-%m-%d') if task.due_date else 'No Date' }}
-            {% if task.is_completed %} Task complete {% else %} {% endif %}
-        </li>
-    {% endfor %}
-</ul>
-<a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/static/style.css">
+    <title>W Notes+ | {{ subject.name }}</title>
+</head>
+<body>
+    <main class="home-content">
+        <h2 class="auth_title">Tasks for {{ subject.name }}</h2>
+        
+        <div class="signup_row" style="margin-bottom: 20px;">
+            <a href="{{ url_for('add_task') }}?subject_id={{ subject.subject_id }}" class="button_signup" style="width: auto; padding: 10px 20px;">
+                + Add Task to this Subject
+            </a>
+        </div>
+
+        <ul class="subject_list">
+            {% for task in subject.tasks %}
+            <li>
+                <div class="subject_card" style="text-align: left; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong style="font-size: 1.1em;">{{ task.title }}</strong><br>
+                        <small style="color: #bbb;">Due: {{ task.due_date.strftime('%Y-%m-%d') if task.due_date else 'No Date' }}</small>
+                    </div>
+                    
+                    <div class="task_actions">
+                        {% if task.is_completed %}
+                            <span style="color: #4CAF50; font-weight: bold;">Done</span>
+                        {% else %}
+                            <a href="{{ url_for('complete_task', task_id=task.task_id) }}" class="button_signup" style="background-color: transparent; border: 1px solid #ff7543; font-size: 12px; width: auto; padding: 5px 10px;">
+                                Complete
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </li>
+            {% else %}
+            <p style="color: #888;">No tasks found for this subject.</p>
+            {% endfor %}
+        </ul>
+
+        <hr style="border: 0; border-top: 1px solid #444; margin: 30px 0;">
+
+        <div class="signup_row">
+            <a href="{{ url_for('dashboard') }}" class="button_signup" style="background-color: #555;">
+                Back to Dashboard
+            </a>
+        </div>
+    </main>
+</body>
 </html>

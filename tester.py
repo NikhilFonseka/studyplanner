@@ -4,7 +4,7 @@ import pytest
 
 def run_test():
     resetdb()
-#tests signing in into the site
+#   tests signing in into the site
     client = app.test_client()
     
     with app.app_context():
@@ -50,14 +50,14 @@ def client():
         yield client
 
 def test_dashboard_access(client):
-    #Proves the dashboard loads for a logged in user
+    """Proves the dashboard loads for a logged in user"""
     client.post('/signin', data={'username or email': 'test@gmail.com', 'password': 'password123'}, follow_redirects=True)
     rv = client.get('/dashboard')
     assert rv.status_code == 200
     assert b"W Notes+" in rv.data
 
 def test_navigation_links(client):
-    #proves all links are functional
+    """proves all links are functional"""
     client.post('/signin', data={'username or email': 'test@gmail.com', 'password': 'password123'}, follow_redirects=True)
     rv = client.get('/dashboard')
     assert b'href="/logout"' in rv.data
@@ -69,7 +69,7 @@ def test_add_subject(client):
     """Tests if a user can successfully create a subject"""
     client.post('/signin', data={'username or email': 'test@gmail.com', 'password': 'password123'}, follow_redirects=True)
     
-    # Post new subject data
+    # enters new subject
     rv = client.post('/add_subject', data={
         'name': 'Computing',
         'color': '#ff7543'
@@ -81,7 +81,6 @@ def test_add_subject(client):
 
 def test_unauthorized_subject_access(client):
     """Proves a user cannot see another user's subject"""
-    # Create a subject belonging to User #99 (not the test user)
     with app.app_context():
         from app import Subject, db
         enemy_sub = Subject(name="Secret Info", user_id=99)
@@ -89,7 +88,6 @@ def test_unauthorized_subject_access(client):
         db.session.commit()
         enemy_id = enemy_sub.subject_id
 
-    # access it while logged in as 'testuser'
     client.post('/signin', data={'username or email': 'test@gmail.com', 'password': 'password123'}, follow_redirects=True)
     rv = client.get(f'/subject/{enemy_id}')
     
