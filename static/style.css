@@ -1,11 +1,10 @@
-/* base layout */
+/* global layout */
 body { 
     background-color: #1a1a1a; 
     color: #e0e0e0; 
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    font-family: 'Segoe UI', sans-serif; 
     margin: 0; 
     padding: 0; 
-    line-height: 1.6;
 }
 
 .container { 
@@ -14,96 +13,69 @@ body {
     padding: 20px; 
 }
 
-/* header & navigation */
-.header { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    padding: 20px 0;
-    border-bottom: 1px solid #333;
-    margin-bottom: 30px;
-}
-
-.nav-links a { 
-    color: #888; 
-    text-decoration: none; 
-    margin-left: 20px; 
-    font-size: 0.9em; 
-    transition: color 0.3s;
-}
-
-.nav-links a:hover { color: #4CAF50; }
-
-/* reusable card component */
-.card { 
-    background: #252525; 
+/* reusable components using underscore names */
+.card_box { 
+    background-color: #252525; 
     padding: 20px; 
     border-radius: 12px; 
     border: 1px solid #333; 
     margin-bottom: 20px; 
-    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
 }
 
-/* forms & inputs */
-.input-field { 
+.input_field { 
     width: 100%; 
     padding: 12px; 
     margin-bottom: 15px; 
-    background: #121212; 
+    background-color: #121212; 
     border: 1px solid #444; 
     color: white; 
     border-radius: 6px; 
     box-sizing: border-box; 
-    font-size: 1em;
 }
 
-.input-field:focus {
-    outline: none;
-    border-color: #4CAF50;
-}
-
-/* buttons */
-.btn {
-    padding: 12px 20px;
+/* button naming convention */
+.button_main {
+    padding: 10px 18px;
     border: none;
     border-radius: 6px;
     cursor: pointer;
     font-weight: bold;
     text-decoration: none;
     display: inline-block;
-    transition: opacity 0.3s;
-    font-size: 0.9em;
+    transition: 0.3s;
 }
 
-.btn-primary { background-color: #4CAF50; color: white; }
-.btn-secondary { background-color: #444; color: white; }
-.btn-danger { background-color: #cf6679; color: white; }
-.btn:hover { opacity: 0.8; }
+.button_primary { background-color: #4CAF50; color: white; }
+.button_danger { background-color: #cf6679; color: white; }
+.button_secondary { background-color: #444; color: #bbb; }
 
-/* task & session specific styles */
-.tag-badge {
-    background: #333;
-    color: #4CAF50;
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-size: 0.75em;
-    text-transform: lowercase;
-}
-
-.session-item {
+/* 2nf study session items */
+.session_row {
     display: flex;
     justify-content: space-between;
     padding: 10px 0;
     border-bottom: 1px solid #333;
+    align-items: center;
 }
 
-.completed-task {
-    text-decoration: line-through;
-    color: #666;
+/* this stops the editor from complaining about the style attribute */
+.subject_badge {
+    color: var(--sub-color, #4CAF50);
+    border: 1px solid var(--sub-color, #4CAF50);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.8em;
 }
 
-/* utility classes */
-.flex { display: flex; gap: 15px; align-items: center; }
-.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-.text-small { font-size: 0.85em; color: #888; }
-.mt-10 { margin-top: 10px; }
+/* utility grid */
+.grid_layout { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 20px; 
+}
+
+.flex_center { 
+    display: flex; 
+    gap: 10px; 
+    align-items: center; 
+}

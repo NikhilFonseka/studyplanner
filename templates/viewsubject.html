@@ -1,132 +1,35 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="/static/style.css">
-    <title>W Notes+ | {{ subject.name }}</title>
-</head>
-<body>
-    <div style="padding: 20px 0 0 20px;">
-        <h2 style="margin: 0; color: white;">W Notes +</h2>
+{% extends "base.html" %}
+
+{% block content %}
+<div class="flex_center" style="justify-content: space-between; margin-bottom: 20px;">
+    <h2>{{ subject.name|lower }}</h2>
+    <div class="flex_center">
+        <span class="subject_badge" style="--sub-color: {{ subject.color_tag }}">
+            active
+        </span>
+        <a href="{{ url_for('delete_subject', subject_id=subject.subject_id) }}" class="button_main button_danger">delete</a>
+    </div>
+</div>
+
+<div class="grid_layout">
+    <div class="card_box">
+        <h3>tasks</h3>
+        {% for task in subject.tasks %}
+            <div class="session_row">
+                <span>{{ task.title|lower }}</span>
+                <a href="{{ url_for('complete_task', task_id=task.task_id) }}" class="button_main button_secondary">check</a>
+            </div>
+        {% endfor %}
     </div>
 
-    <main class="home-content" style="padding: 20px;">
-        <h2 class="auth_title">Tasks for {{ subject.name }}</h2>
-        
-        <div class="signup_row" style="margin-bottom: 20px;">
-            <a href="{{ url_for('add_task') }}?subject_id={{ subject.subject_id }}" class="button_signup" style="width: auto; padding: 10px 20px;">
-                + Add Task
-            </a>
-        </div>
-
-        <ul class="subject_list">
-            {% for task in subject.tasks %}
-            <li>
-                <div class="subject_card" style="text-align: left; display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <span class="task-tag">{{ task.tag if task.tag else 'General' }}</span><br>
-                        
-                        <strong style="font-size: 1.1em;">{{ task.title }}</strong><br>
-                        
-                        {% if task.description %}
-                            <p style="color: #999; font-size: 0.9em; margin: 5px 0;">{{ task.description }}</p>
-                        {% endif %}
-                        
-                        <small style="color: #bbb;">Due: {{ task.due_date.strftime('%Y-%m-%d') if task.due_date else 'No Date' }}</small>
-                    </div>
-                    <div class="task_actions">
-                        {% if task.is_completed %}
-                            <span style="color: #4CAF50; font-weight: bold;">Done</span>
-                        {% else %}
-                            <a href="{{ url_for('complete_task', task_id=task.task_id) }}" class="button_signup" style="background-color: transparent; border: 1px solid #ff7543; font-size: 12px; width: auto; padding: 5px 10px;">
-                                Complete
-                            </a>
-                        {% endif %}
-                    </div>
-                </div>
-            </li>
-            {% else %}
-            <p style="color: #888;">No tasks found.</p>
-            {% endfor %}
-        </ul>
-        <div class="subject_card" style="margin-top: 20px;">
-            <h3 style="color: white; margin-top: 0;">log study session</h3>
-            <form action="{{ url_for('log_session', subject_id=subject.subject_id) }}" method="POST">
-                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                    <input type="number" name="duration" placeholder="minutes (e.g. 45)" required 
-                        style="flex: 1; padding: 10px; background: #333; border: 1px solid #444; color: white; border-radius: 5px;">
-                    
-                    <button type="submit" class="button_signup" style="padding: 0 20px;">log session</button>
-                </div>
-                
-                <textarea name="notes" placeholder="what did you focus on during this session?" 
-                        style="width: 100%; padding: 10px; background: #333; border: 1px solid #444; color: white; border-radius: 5px; box-sizing: border-box;"></textarea>
-            </form>
-        </div>
-
-        <div class="subject_card" style="margin-top: 20px;">
-            <h3 style="color: white; margin-top: 0;">recent sessions</h3>
-            {% if subject.study_sessions %}
-                <div style="max-height: 300px; overflow-y: auto;">
-                    {% for s in subject.study_sessions|sort(attribute='start_time', reverse=True) %}
-                    <div style="padding: 10px 0; border-bottom: 1px solid #444; display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <span style="color: #4CAF50; font-weight: bold;">{{ s.duration }} mins</span>
-                            <p style="margin: 5px 0 0 0; font-size: 0.85em; color: #888;">{{ s.notes if s.notes else 'no notes added' }}</p>
-                        </div>
-                        <div style="font-size: 0.8em; color: #666;">
-                            {{ s.start_time.strftime('%b %d, %H:%M') }}
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <p style="color: #666; font-style: italic;">no study sessions recorded for this subject yet</p>
-            {% endif %}
-        </div>
-
-        <hr style="border: 0; border-top: 1px solid #444; margin: 30px 0;">
-
-        <div class="messaging-section" style="max-width: 800px; text-align: left;">
-            <h3>Subject Discussion</h3>
-            
-            <div class="message-display" style="background: #1a1a1a; height: 300px; overflow-y: auto; padding: 20px; border-radius: 8px; border: 1px solid #333; display: flex; flex-direction: column; gap: 10px;">
-                {% for msg in subject.messages %}
-                    <div class="msg {% if msg.sender_id == session['user_id'] %}msg-sent{% else %}msg-received{% endif %}">
-                        <strong style="color: #4CAF50; font-size: 0.8rem;">{{ msg.sender.username }}</strong><br>
-                        <span style="color: #eee;">{{ msg.content }}</span><br>
-                        <small style="color: #999; font-size: 0.6rem;">{{ msg.timestamp.strftime('%H:%M') }}</small>
-                    </div>
-                {% else %}
-                    <p style="color: #7d7c7c; text-align: center;">No messages yet.</p>
-                {% endfor %}
+    <div class="card_box">
+        <h3>study history</h3>
+        {% for s in subject.study_sessions|sort(attribute='start_time', reverse=True) %}
+            <div class="session_row">
+                <strong>{{ s.duration }}m</strong>
+                <span style="font-size: 0.8em; color: #888;">{{ s.start_time.strftime('%H:%M') }}</span>
             </div>
-
-            <form action="{{ url_for('send_message', subject_id=subject.subject_id) }}" method="POST" style="margin-top: 20px; display: flex; gap: 10px;">
-                <select name="receiver_id" required style="padding: 10px; border-radius: 5px; background: #333; color: white;">
-                    <option value="" disabled selected>Send to...</option>
-                    {% for member in subject.members %}
-                        {% if member.user_id != session['user_id'] %}
-                            <option value="{{ member.user_id }}">{{ member.user.username }}</option>
-                        {% endif %}
-                    {% endfor %}
-                    {% if subject.user_id != session['user_id'] %}
-                        <option value="{{ subject.user_id }}">Subject Owner</option>
-                    {% endif %}
-                </select>
-
-                <input type="text" name="content" placeholder="Type a message..." required 
-                       style="flex-grow: 1; padding: 10px; border-radius: 5px; border: none; background: #333; color: white;">
-                
-                <button type="submit" class="button_signup" style="width: auto; padding: 10px 20px;">Send</button>
-            </form>
-        </div>
-
-        <div class="signup_row" style="margin-top: 40px;">
-            <a href="{{ url_for('dashboard') }}" class="button_signup" style="background-color: #555;">
-                Back to Dashboard
-            </a>
-        </div>
-    </main>
-</body>
-</html>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

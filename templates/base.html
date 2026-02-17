@@ -2,85 +2,20 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>W Notes+ | {% block title %}{% endblock %}</title>
-    
-    <style>
-        body {
-            background-color: #1a1a1a;
-            color: white;
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-        .nav-links a {
-            color: #888;
-            text-decoration: none;
-            margin-left: 15px;
-            font-size: 0.9em;
-        }
-        .nav-links a:hover {
-            color: white;
-        }
-        .flash-messages {
-            background: #332222;
-            color: #ff8888;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            list-style: none;
-        }
-        .subject_card {
-            background: #222;
-            padding: 20px;
-            border-radius: 10px;
-            border: 1px solid #333;
-            margin-bottom: 20px;
-        }
-        .button_signup {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div class="container">
-        <header class="header">
-            <h2 style="margin: 0;">W Notes +</h2>
-            <nav class="nav-links">
+        <header class="flex" style="justify-content: space-between; margin-bottom: 30px;">
+            <h2 style="margin: 0;">w notes +</h2>
+            <nav>
                 {% if session.get('user_id') %}
-                    <a href="{{ url_for('dashboard') }}">dashboard</a>
-                    <a href="{{ url_for('logout') }}">logout</a>
-                {% else %}
-                    <a href="{{ url_for('signin') }}">signin</a>
-                    <a href="{{ url_for('signup') }}">signup</a>
+                    <a href="{{ url_for('dashboard') }}" style="color: #888; text-decoration: none;">dashboard</a>
+                    <a href="{{ url_for('logout') }}" style="color: #888; text-decoration: none; margin-left: 15px;">logout</a>
                 {% endif %}
             </nav>
         </header>
-
-        {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            <ul class="flash-messages">
-              {% for message in messages %}
-                <li>{{ message|lower }}</li>
-              {% endfor %}
-            </ul>
-          {% endif %}
-        {% endwith %}
 
         {% block content %}{% endblock %}
     </div>
