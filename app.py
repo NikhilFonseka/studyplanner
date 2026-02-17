@@ -74,6 +74,7 @@ class Task(db.Model):
     title = db.Column(db.String(50), nullable=False)
     description = db.Column(db.Text)
     due_date = db.Column(db.DateTime)
+    tag = db.Column(db.String(20), default="General") 
     is_completed = db.Column(db.Boolean, default=False)
     subject_id = db.Column(
         db.Integer, db.ForeignKey('subject.subject_id'), nullable=False

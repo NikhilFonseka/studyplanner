@@ -97,3 +97,35 @@ input.input_group {
     border-radius: 8px;
     font-size: 18px;
 }
+/* --- Message Bubbles --- */
+.msg { 
+    padding: 10px; 
+    border-radius: 10px; 
+    max-width: 75%; 
+    margin-bottom: 5px; 
+}
+
+.msg-sent { 
+    background: #005c4b; 
+    align-self: flex-end; 
+    margin-left: auto; 
+    text-align: right; 
+}
+
+.msg-received { 
+    background: #333; 
+    align-self: flex-start; 
+}
+
+/* --- Task Tags --- */
+.task-tag {
+    background: #444; 
+    color: #4CAF50; 
+    font-size: 0.7rem; 
+    padding: 2px 8px; 
+    border-radius: 10px; 
+    text-transform: uppercase; 
+    font-weight: bold;
+    display: inline-block;
+    margin-bottom: 5px;
+}

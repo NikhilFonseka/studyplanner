@@ -4,12 +4,6 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="/static/style.css">
     <title>W Notes+ | {{ subject.name }}</title>
-    <style>
-        /* Simple classes for message alignment */
-        .msg { padding: 10px; border-radius: 10px; max-width: 75%; margin-bottom: 5px; }
-        .msg-sent { background: #005c4b; align-self: flex-end; margin-left: auto; text-align: right; }
-        .msg-received { background: #333; align-self: flex-start; }
-    </style>
 </head>
 <body>
     <div style="padding: 20px 0 0 20px;">
@@ -30,7 +24,14 @@
             <li>
                 <div class="subject_card" style="text-align: left; display: flex; justify-content: space-between; align-items: center;">
                     <div>
+                        <span class="task-tag">{{ task.tag if task.tag else 'General' }}</span><br>
+                        
                         <strong style="font-size: 1.1em;">{{ task.title }}</strong><br>
+                        
+                        {% if task.description %}
+                            <p style="color: #999; font-size: 0.9em; margin: 5px 0;">{{ task.description }}</p>
+                        {% endif %}
+                        
                         <small style="color: #bbb;">Due: {{ task.due_date.strftime('%Y-%m-%d') if task.due_date else 'No Date' }}</small>
                     </div>
                     <div class="task_actions">
