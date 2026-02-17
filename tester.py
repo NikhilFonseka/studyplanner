@@ -104,7 +104,7 @@ def test_add_subject(client):
 def test_unauthorized_subject_access(client):
     """Proves a user cannot see another user's subject (403 check)."""
     with app.app_context():
-        enemy_sub = Subject(name="Secret Info", user_id=99)
+        enemy_sub = Subject(name="secret subject", user_id=99)
         db.session.add(enemy_sub)
         db.session.commit()
         enemy_id = enemy_sub.subject_id

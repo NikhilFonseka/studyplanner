@@ -1,47 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <title>W Notes+ Dashboard</title>
-</head>
-<body class="dashboard_container">
-    <nav class="top_nav">
-        <h1 class="main_title">W Notes+</h1>
-        <p>Welcome <strong>{{ username}} </strong>!</p>
-        <a href="/logout" class="button_signup" style="width: 100px;">Logout</a>
-    </nav>
+{% extends "base.html" %}
+{% block content %}
+    <h1 class="brand_title">W Notes+</h1>
+    <h2 class="view_title">Select Subject</h2>
 
-    <main>
-        <h2>Your Subjects</h2>
+    <div class="form_container" style="display: flex; flex-direction: column; align-items: center;">
+        {% for subject in subjects %}
+        <a href="{{ url_for('view_subject', subject_id=subject.subject_id) }}" class="subject_button">
+            {{ subject.name|lower }}
+        </a>
+            </a>
+        {% endfor %}
         
-        <div class="signup_row">
-            <a href="/add_subject" class="button_signup">Add New Subject</a>
-            <a href="/add_task" class="button_signup">Add New Task</a>
-        </div>
-
-        <ul class="subject_list">
-            {% for subject in subjects %}
-            <li>
-                <a href="{{ url_for('view_subject', subject_id=subject.subject_id) }}" class="subject_card">
-                    {{ subject.name }}
-                </a>
-            </li>
-            {% else %}
-            <p>No subjects yet. Click "Add New Subject" to start!</p>
-            {% endfor %}
-        </ul>
-
-        <h3>Pending Subject Requests</h3>
-        <ul>
-            {% for member in current_user_memberships %}
-                {% if member.status == 'pending' %}
-                    <li>
-                        {{ member.subject.name }} (from User #{{ member.subject.user_id }})
-                        <a href="{{ url_for('accept_invite', membership_id=member.id) }}">Accept</a>
-                    </li>
-                {% endif %}
-            {% endfor %}
-        </ul>
-    </main>
-</body>
-</html>
+        <a href="{{ url_for('add_subject') }}" 
+           style="color: #888; text-align: center; margin-top: 30px; text-decoration: none; font-size: 0.9em;">
+           + add new subject
+        </a>
+    </div>
+{% endblock %}

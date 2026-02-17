@@ -1,26 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <title>Add Subject - W Notes+</title>
-</head>
-<body class="dashboard-body">
-    <header class="home-header">
-        <h1 class="main_title">W Notes+</h1>
-    </header>
+{% extends "base.html" %}
+{% block title %}new subject{% endblock %}
 
-    <main class="home-content">
-        <h2>Create New Subject</h2>
-        <form method="POST" action="/add_subject">
-            <input type="text" name="name" placeholder="Subject Name (e.g. Math)" class="input_group" required>
-            <input type="text" name="color" placeholder="Color Tag (e.g. #ff7543)" class="input_group">
+{% block content %}
+    <h1 class="brand_title">W Notes+</h1>
+    <h2 class="view_title">new subject</h2>
+
+    <div style="width: 300px;">
+        <form action="{{ url_for('add_subject') }}" method="POST">
+            <input type="text" name="name" placeholder="subject name e.g Math" class="input_field" required>
             
-            <button type="submit" class="button_login">Save Subject</button>
-            <div class="signup_row">
-                <a href="/dashboard" class="button_signup">Back to Dashboard</a>
+            <div style="text-align: left; margin-bottom: 5px;">
+                <label style="font-size: 0.8em; color: #888;">theme color</label>
             </div>
+            <input type="color" name="color" class="input_field" style="height: 45px; padding: 5px; cursor: pointer;">
+            
+            <button type="submit" class="button_signup" style="width: 100%;">create</button>
         </form>
-
-    </main>
-</body>
-</html>
+        <a href="{{ url_for('dashboard') }}" style="display: block; text-align: center; margin-top: 20px; color: #888; text-decoration: none; font-size: 0.8em;">cancel</a>
+    </div>
+{% endblock %}

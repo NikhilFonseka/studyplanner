@@ -1,23 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>W Notes+ | {% block title %}{% endblock %}</title>
+    <title>W Notes+</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div class="container">
-        <header class="flex" style="justify-content: space-between; margin-bottom: 30px;">
-            <h2 style="margin: 0;">w notes +</h2>
-            <nav>
-                {% if session.get('user_id') %}
-                    <a href="{{ url_for('dashboard') }}" style="color: #888; text-decoration: none;">dashboard</a>
-                    <a href="{{ url_for('logout') }}" style="color: #888; text-decoration: none; margin-left: 15px;">logout</a>
-                {% endif %}
-            </nav>
-        </header>
-
+    <main>
         {% block content %}{% endblock %}
-    </div>
+    </main>
 </body>
 </html>

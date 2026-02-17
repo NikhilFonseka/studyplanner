@@ -1,35 +1,50 @@
 {% extends "base.html" %}
-
 {% block content %}
-<div class="flex_center" style="justify-content: space-between; margin-bottom: 20px;">
-    <h2>{{ subject.name|lower }}</h2>
-    <div class="flex_center">
-        <span class="subject_badge" style="--sub-color: {{ subject.color_tag }}">
-            active
-        </span>
-        <a href="{{ url_for('delete_subject', subject_id=subject.subject_id) }}" class="button_main button_danger">delete</a>
-    </div>
-</div>
+    <h1 class="brand_title">{{ subject.name|lower }}</h1>
+    
+    <div style="display: flex; gap: 50px; margin-top: 30px; width: 90%; max-width: 900px;">
+        <div style="flex: 1;">
+            <h3 style="color: #444;">tasks</h3>
+            {% for task in subject.tasks %}
+                <div style="padding: 12px 0; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+                    <span>
+                        {{ task.title|lower }} 
+                        {% if task.tag %}<span class="tag_badge">{{ task.tag|lower }}</span>{% endif %}
+                    </span>
+                    <a href="{{ url_for('complete_task', task_id=task.task_id) }}" style="color: #ff6b4a; text-decoration: none;">done</a>
+                </div>
+            {% endfor %}
+            <a href="{{ url_for('add_task') }}" style="display: block; margin-top: 15px; color: #888; text-decoration: none;">+ new task</a>
 
-<div class="grid_layout">
-    <div class="card_box">
-        <h3>tasks</h3>
-        {% for task in subject.tasks %}
-            <div class="session_row">
-                <span>{{ task.title|lower }}</span>
-                <a href="{{ url_for('complete_task', task_id=task.task_id) }}" class="button_main button_secondary">check</a>
-            </div>
-        {% endfor %}
-    </div>
+            <h3 style="color: #444; margin-top: 40px;">study log</h3>
+            <form action="{{ url_for('log_session', subject_id=subject.subject_id) }}" method="POST" style="display: flex; gap: 10px;">
+                <input type="number" name="duration" placeholder="mins" class="input_field" style="flex: 1;">
+                <button type="submit" class="button_signup">log</button>
+            </form>
+        </div>
 
-    <div class="card_box">
-        <h3>study history</h3>
-        {% for s in subject.study_sessions|sort(attribute='start_time', reverse=True) %}
-            <div class="session_row">
-                <strong>{{ s.duration }}m</strong>
-                <span style="font-size: 0.8em; color: #888;">{{ s.start_time.strftime('%H:%M') }}</span>
-            </div>
-        {% endfor %}
+        <div style="flex: 1;">
+            {% if messages %}
+                <h3 style="color: #444;">messages</h3>
+                <div style="max-height: 200px; overflow-y: auto; margin-bottom: 10px;">
+                    {% for msg in messages %}
+                        <div class="message_box">{{ msg.content|lower }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <form action="{{ url_for('send_message', subject_id=subject.subject_id) }}" method="POST">
+                <input type="text" name="content" placeholder="send note..." class="input_field">
+            </form>
+
+            <h3 style="color: #444; margin-top: 30px;">history</h3>
+            {% for s in subject.study_sessions|sort(attribute='start_time', reverse=True) %}
+                <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">
+                    {{ s.duration }}m - {{ s.start_time.strftime('%b %d') }}
+                </div>
+            {% endfor %}
+        </div>
     </div>
-</div>
+    
+    <a href="{{ url_for('dashboard') }}" style="margin-top: 50px; color: #888; text-decoration: none;">back to menu</a>
 {% endblock %}

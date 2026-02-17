@@ -1,22 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <title>W Notes+ Sign Up</title>
-</head>
-<body class="login_container">
-    <h1 class="main_title">W Notes+</h1>
-    
-    <form method="POST" action="/signup">
-        <input type="text" name="username" placeholder="Username" class="input_group" required>
-        <input type="email" name="email" placeholder="Email" class="input_group" required>
-        <input type="password" name="password" placeholder="Password" class="input_group" required>
+{% extends "base.html" %}
+{% block title %}register{% endblock %}
 
-        <button type="submit" class="button_login">Create account</button>
-        
-        <div class="signup_row">
-            <a href="/signin" class="button_signup">Login instead</a>
-        </div>
-    </form>
-</body>
-</html>
+{% block content %}
+    <h1 class="brand_title">W Notes+</h1>
+    <h2 class="view_title">signup</h2>
+
+    <div style="width: 300px;">
+        <form action="{{ url_for('signup') }}" method="POST">
+            <input type="text" name="username" placeholder="username" class="input_field" required>
+            <input type="email" name="email" placeholder="email" class="input_field" required>
+            <input type="password" name="password" placeholder="password" class="input_field" required>
+            <button type="submit" class="button_signup" style="width: 100%;">create account</button>
+        </form>
+        <p style="font-size: 0.8em; margin-top: 20px; text-align: center;">
+            <a href="{{ url_for('signin') }}" style="color: #888; text-decoration: none;">already registered? login</a>
+        </p>
+    </div>
+{% endblock %}

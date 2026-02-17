@@ -1,12 +1,19 @@
 {% extends "base.html" %}
-
-{% block title %}add task{% endblock %}
-
 {% block content %}
-<div class="subject_card">
-    <h3 style="margin-top: 0;">create new task</h3>
-    <form action="{{ url_for('add_task') }}" method="POST">
-        <button type="submit" class="button_signup">add task</button>
-    </form>
-</div>
+    <h1 class="brand_title">W Notes+</h1>
+    <h2 class="view_title">new task</h2>
+
+    <div style="width: 300px;">
+        <form action="{{ url_for('add_task') }}" method="POST">
+            <input type="text" name="title" placeholder="task name" class="input_field" required>
+            <input type="text" name="tag" placeholder="tag (e.g. urgent)" class="input_field">
+            <select name="subject_id" class="input_field">
+                {% for s in subjects %}
+                    <option value="{{ s.subject_id }}">{{ s.name|lower }}</option>
+                {% endfor %}
+            </select>
+            <input type="date" name="due_date_str" class="input_field">
+            <button type="submit" class="button_signup" style="width: 100%;">save task</button>
+        </form>
+    </div>
 {% endblock %}

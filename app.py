@@ -84,7 +84,11 @@ class Task(db.Model):
         db.Integer, db.ForeignKey('user.user_id'), nullable=False
     )
     tags = db.relationship('Tag', secondary=task_tags, backref=db.backref('tasks', lazy='dynamic'))
-
+class StudySession(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    duration = db.Column(db.Integer, nullable=False)
+    start_time = db.Column(db.DateTime, default=db.func.now())
+    subject_id = db.Column(db.Integer, db.ForeignKey('subject.subject_id'), nullable=False)
 
 class Tag(db.Model):
     """Table for task tags for task categories or tags"""
@@ -100,7 +104,7 @@ class Message(db.Model):
     
     # Foreign Keys
     sender_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=False)
-    receiver_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=False)
+    receiver_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=True)
     subject_id = db.Column(db.Integer, db.ForeignKey('subject.subject_id'), nullable=False)
 
     # Relationship to get the sender's name easily
@@ -254,8 +258,25 @@ def view_subject(subject_id):
     ).first()
     if not subject:
         return "Unauthorized Access", 403
-    return render_template('viewsubject.html', subject=subject)
+    messages = Message.query.filter_by(subject_id=subject_id).all()
 
+    return render_template('viewsubject.html', subject=subject, messages=messages)
+@app.route('/log_session/<int:subject_id>', methods=['POST'])
+def log_session(subject_id):
+    if 'user_id' not in session:
+        return redirect(url_for('signin'))
+    
+    duration = request.form.get('duration')
+    if duration:
+        # Create a new session linked to this subject
+        new_session = StudySession(
+            duration=int(duration),
+            subject_id=subject_id
+        )
+        db.session.add(new_session)
+        db.session.commit()
+    
+    return redirect(url_for('view_subject', subject_id=subject_id))
 
 @app.route('/complete_task/<int:task_id>')
 def complete_task(task_id):
@@ -303,13 +324,13 @@ def invite_user(subject_id):
 
 @app.route('/send_message/<int:subject_id>', methods=['POST'])
 def send_message(subject_id):
-    """Handles posting a new message to a subject discussion."""
     if 'user_id' not in session:
         return redirect(url_for('signin'))
         
     content = request.form.get('content')
-    receiver_id = request.form.get('receiver_id')
-    if content and receiver_id:
+    receiver_id = request.form.get('receiver_id') 
+    
+    if content:
         new_msg = Message(
             content=content,
             sender_id=session['user_id'],
@@ -318,7 +339,7 @@ def send_message(subject_id):
         )
         db.session.add(new_msg)
         db.session.commit()
-        
+    
     return redirect(url_for('view_subject', subject_id=subject_id))
 
 
