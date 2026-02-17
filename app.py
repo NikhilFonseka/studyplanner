@@ -115,36 +115,6 @@ class SubjectMember(db.Model):
 
     user = db.relationship('User', backref='subject_memberships')
     subject = db.relationship('Subject', backref='members')
-# Controllers@app.route('/schema_info')
-def get_schema_info():
-    # Define your complex SQL query as a string
-    sql_query = """
-    SELECT 'mysql' dbms, t.TABLE_SCHEMA, t.TABLE_NAME, c.COLUMN_NAME, c.ORDINAL_POSITION,
-           c.DATA_TYPE, c.CHARACTER_MAXIMUM_LENGTH, n.CONSTRAINT_TYPE,
-           k.REFERENCED_TABLE_SCHEMA, k.REFERENCED_TABLE_NAME, k.REFERENCED_COLUMN_NAME
-    FROM INFORMATION_SCHEMA.TABLES t
-    LEFT JOIN INFORMATION_SCHEMA.COLUMNS c ON t.TABLE_SCHEMA = c.TABLE_SCHEMA AND t.TABLE_NAME = c.TABLE_NAME
-    LEFT JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE k ON c.TABLE_SCHEMA = k.TABLE_SCHEMA AND c.TABLE_NAME = k.TABLE_NAME AND c.COLUMN_NAME = k.COLUMN_NAME
-    LEFT JOIN INFORMATION_SCHEMA.TABLE_CONSTRAINTS n ON k.CONSTRAINT_SCHEMA = n.CONSTRAINT_SCHEMA AND k.CONSTRAINT_NAME = n.CONSTRAINT_NAME AND k.TABLE_SCHEMA = n.TABLE_SCHEMA AND k.TABLE_NAME = n.TABLE_NAME
-    WHERE t.TABLE_TYPE = 'BASE TABLE' AND t.TABLE_SCHEMA NOT IN ('INFORMATION_SCHEMA', 'mysql', 'performance_schema');
-    """
-    
-    try:
-        # Execute the raw SQL query using text()
-        result = db.session.execute(text(sql_query))
-        
-        # Process the results
-        # You can fetch all rows and format them as a list of dictionaries for a Flask response
-        rows = result.fetchall()
-        
-        # Example of how to structure the data for a JSON response (requires import jsonify)
-        # data = [dict(row._mapping) for row in rows]
-        # return jsonify(data) 
-        
-        return f"Query executed successfully. Number of rows: {len(rows)}" # Or return the actual data
-    except Exception as e:
-        return f"An error occurred: {e}"
-
 
 @app.route('/')
 def index():
@@ -230,25 +200,43 @@ def add_subject():
 
 @app.route('/add_task', methods=['GET', 'POST'])
 def add_task():
-    """Adds a task to a specific subject with date validation"""
+    """Adds a task to a specific subject with date validation and tagging"""
     if 'user_id' not in session:
         return redirect(url_for('signin'))
+    
     user_subjects = Subject.query.filter_by(user_id=session['user_id']).all()
+    
     if request.method == 'POST':
         title = request.form.get('title')
         description = request.form.get('description')
-        date_str = request.form.get('due_date')
+        tag = request.form.get('tag')  
         sub_id = request.form.get('subject_id')
+        
+        date_str = request.form.get('due_date_str') 
+        
         due_date = None
         if date_str and date_str.strip():
             try:
                 due_date = datetime.strptime(date_str, '%Y-%m-%d')
             except ValueError:
-                due_date = None
-        new_task = Task(title=title, description=description, due_date=due_date, subject_id=sub_id, user_id=session['user_id'])
+                due_date = None 
+
+
+        new_task = Task(
+            title=title, 
+            description=description, 
+            tag=tag, 
+            due_date=due_date, 
+            subject_id=sub_id, 
+            user_id=session['user_id']
+        )
+        
         db.session.add(new_task)
         db.session.commit()
-        return redirect(url_for('dashboard'))
+        
+
+        return redirect(url_for('view_subject', subject_id=sub_id))
+        
     return render_template('addtask.html', subjects=user_subjects)
 
 
