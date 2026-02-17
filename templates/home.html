@@ -30,6 +30,18 @@
             <p>No subjects yet. Click "Add New Subject" to start!</p>
             {% endfor %}
         </ul>
+
+        <h3>Pending Subject Requests</h3>
+        <ul>
+            {% for member in current_user_memberships %}
+                {% if member.status == 'pending' %}
+                    <li>
+                        {{ member.subject.name }} (from User #{{ member.subject.user_id }})
+                        <a href="{{ url_for('accept_invite', membership_id=member.id) }}">Accept</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
     </main>
 </body>
 </html>

@@ -12,7 +12,7 @@ from flask import (
     Flask, render_template, request, redirect, url_for, flash, session
 )
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import or_
+from sqlalchemy import or_, text
 from werkzeug.security import generate_password_hash, check_password_hash
 from jinja2 import Environment, FileSystemLoader, exceptions
 
@@ -41,7 +41,10 @@ db = SQLAlchemy(app)
 
 
 # Models
-
+task_tags = db.Table('task_tags',
+    db.Column('task_id', db.Integer, db.ForeignKey('task.task_id'), primary_key=True),
+    db.Column('tag_id', db.Integer, db.ForeignKey('tag.tag_id'), primary_key=True)
+)
 
 class User(db.Model):
     """Table for application users."""
@@ -69,21 +72,77 @@ class Task(db.Model):
 
     task_id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(50), nullable=False)
+    description = db.Column(db.Text)
     due_date = db.Column(db.DateTime)
     is_completed = db.Column(db.Boolean, default=False)
     subject_id = db.Column(
         db.Integer, db.ForeignKey('subject.subject_id'), nullable=False
     )
+    user_id = db.Column(
+        db.Integer, db.ForeignKey('user.user_id'), nullable=False
+    )
+    tags = db.relationship('Tag', secondary=task_tags, backref=db.backref('tasks', lazy='dynamic'))
 
 
 class Tag(db.Model):
     """Table for task tags for task categories or tags"""
 
     tag_id = db.Column(db.Integer, primary_key=True)
-    tag_name = db.Column(db.String(20), nullable=False)
+    name = db.Column(db.String(20), nullable=False)
 
+class Message(db.Model):
+    """Table for messages sent within a subject context."""
+    message_id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Foreign Keys
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=False)
+    receiver_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=False)
+    subject_id = db.Column(db.Integer, db.ForeignKey('subject.subject_id'), nullable=False)
 
-# Controllers
+    # Relationship to get the sender's name easily
+    sender = db.relationship('User', foreign_keys=[sender_id], backref='sent_messages')
+
+class SubjectMember(db.Model):
+    """Tracks which users have access to a subject and their invite status."""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=False)
+    subject_id = db.Column(db.Integer, db.ForeignKey('subject.subject_id'), nullable=False)
+    # Status can be 'pending' or 'accepted'
+    status = db.Column(db.String(20), default='pending') 
+
+    user = db.relationship('User', backref='subject_memberships')
+    subject = db.relationship('Subject', backref='members')
+# Controllers@app.route('/schema_info')
+def get_schema_info():
+    # Define your complex SQL query as a string
+    sql_query = """
+    SELECT 'mysql' dbms, t.TABLE_SCHEMA, t.TABLE_NAME, c.COLUMN_NAME, c.ORDINAL_POSITION,
+           c.DATA_TYPE, c.CHARACTER_MAXIMUM_LENGTH, n.CONSTRAINT_TYPE,
+           k.REFERENCED_TABLE_SCHEMA, k.REFERENCED_TABLE_NAME, k.REFERENCED_COLUMN_NAME
+    FROM INFORMATION_SCHEMA.TABLES t
+    LEFT JOIN INFORMATION_SCHEMA.COLUMNS c ON t.TABLE_SCHEMA = c.TABLE_SCHEMA AND t.TABLE_NAME = c.TABLE_NAME
+    LEFT JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE k ON c.TABLE_SCHEMA = k.TABLE_SCHEMA AND c.TABLE_NAME = k.TABLE_NAME AND c.COLUMN_NAME = k.COLUMN_NAME
+    LEFT JOIN INFORMATION_SCHEMA.TABLE_CONSTRAINTS n ON k.CONSTRAINT_SCHEMA = n.CONSTRAINT_SCHEMA AND k.CONSTRAINT_NAME = n.CONSTRAINT_NAME AND k.TABLE_SCHEMA = n.TABLE_SCHEMA AND k.TABLE_NAME = n.TABLE_NAME
+    WHERE t.TABLE_TYPE = 'BASE TABLE' AND t.TABLE_SCHEMA NOT IN ('INFORMATION_SCHEMA', 'mysql', 'performance_schema');
+    """
+    
+    try:
+        # Execute the raw SQL query using text()
+        result = db.session.execute(text(sql_query))
+        
+        # Process the results
+        # You can fetch all rows and format them as a list of dictionaries for a Flask response
+        rows = result.fetchall()
+        
+        # Example of how to structure the data for a JSON response (requires import jsonify)
+        # data = [dict(row._mapping) for row in rows]
+        # return jsonify(data) 
+        
+        return f"Query executed successfully. Number of rows: {len(rows)}" # Or return the actual data
+    except Exception as e:
+        return f"An error occurred: {e}"
 
 
 @app.route('/')
@@ -176,6 +235,7 @@ def add_task():
     user_subjects = Subject.query.filter_by(user_id=session['user_id']).all()
     if request.method == 'POST':
         title = request.form.get('title')
+        description = request.form.get('description')
         date_str = request.form.get('due_date')
         sub_id = request.form.get('subject_id')
         due_date = None
@@ -184,7 +244,7 @@ def add_task():
                 due_date = datetime.strptime(date_str, '%Y-%m-%d')
             except ValueError:
                 due_date = None
-        new_task = Task(title=title, due_date=due_date, subject_id=sub_id)
+        new_task = Task(title=title, description=description, due_date=due_date, subject_id=sub_id, user_id=session['user_id'])
         db.session.add(new_task)
         db.session.commit()
         return redirect(url_for('dashboard'))
@@ -214,6 +274,7 @@ def complete_task(task_id):
     return redirect(request.referrer or url_for('dashboard'))
 
 
+
 @app.route('/delete_subject/<int:subject_id>')
 def delete_subject(subject_id):
     """Deletes a subject after verifying ownership"""
@@ -225,6 +286,57 @@ def delete_subject(subject_id):
     flash(f"Subject '{subject.name}' deleted")
     return redirect(url_for('dashboard'))
 
+@app.route('/invite_user/<int:subject_id>', methods=['POST'])
+def invite_user(subject_id):
+    """Creates a pending request for another user to join a subject."""
+    email = request.form.get('email')
+    target_user = User.query.filter_by(email=email).first()
+
+    if target_user:
+        # Check if they are already invited
+        exists = SubjectMember.query.filter_by(
+            user_id=target_user.user_id, 
+            subject_id=subject_id
+        ).first()
+        
+        if not exists:
+            invite = SubjectMember(user_id=target_user.user_id, subject_id=subject_id)
+            db.session.add(invite)
+            db.session.commit()
+            flash("Invite sent!")
+    else:
+        flash("User not found.")
+    return redirect(url_for('view_subject', subject_id=subject_id))
+
+@app.route('/send_message/<int:subject_id>', methods=['POST'])
+def send_message(subject_id):
+    """Handles posting a new message to a subject discussion."""
+    if 'user_id' not in session:
+        return redirect(url_for('signin'))
+        
+    content = request.form.get('content')
+    receiver_id = request.form.get('receiver_id')
+    if content and receiver_id:
+        new_msg = Message(
+            content=content,
+            sender_id=session['user_id'],
+            receiver_id=receiver_id,
+            subject_id=subject_id
+        )
+        db.session.add(new_msg)
+        db.session.commit()
+        
+    return redirect(url_for('view_subject', subject_id=subject_id))
+
+
+@app.route('/accept_invite/<int:membership_id>')
+def accept_invite(membership_id):
+    """Updates status to 'accepted' so the user can participate."""
+    member = SubjectMember.query.get_or_404(membership_id)
+    if member.user_id == session.get('user_id'):
+        member.status = 'accepted'
+        db.session.commit()
+    return redirect(url_for('dashboard'))
 
 def resetdb():
     """Resets all database tables"""
