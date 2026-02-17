@@ -4,14 +4,24 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="/static/style.css">
     <title>W Notes+ | {{ subject.name }}</title>
+    <style>
+        /* Simple classes for message alignment */
+        .msg { padding: 10px; border-radius: 10px; max-width: 75%; margin-bottom: 5px; }
+        .msg-sent { background: #005c4b; align-self: flex-end; margin-left: auto; text-align: right; }
+        .msg-received { background: #333; align-self: flex-start; }
+    </style>
 </head>
 <body>
-    <main class="home-content">
+    <div style="padding: 20px 0 0 20px;">
+        <h2 style="margin: 0; color: white;">W Notes +</h2>
+    </div>
+
+    <main class="home-content" style="padding: 20px;">
         <h2 class="auth_title">Tasks for {{ subject.name }}</h2>
         
         <div class="signup_row" style="margin-bottom: 20px;">
             <a href="{{ url_for('add_task') }}?subject_id={{ subject.subject_id }}" class="button_signup" style="width: auto; padding: 10px 20px;">
-                + Add Task to this Subject
+                + Add Task
             </a>
         </div>
 
@@ -23,7 +33,6 @@
                         <strong style="font-size: 1.1em;">{{ task.title }}</strong><br>
                         <small style="color: #bbb;">Due: {{ task.due_date.strftime('%Y-%m-%d') if task.due_date else 'No Date' }}</small>
                     </div>
-                    
                     <div class="task_actions">
                         {% if task.is_completed %}
                             <span style="color: #4CAF50; font-weight: bold;">Done</span>
@@ -36,34 +45,52 @@
                 </div>
             </li>
             {% else %}
-            <p style="color: #888;">No tasks found for this subject.</p>
+            <p style="color: #888;">No tasks found.</p>
             {% endfor %}
         </ul>
 
         <hr style="border: 0; border-top: 1px solid #444; margin: 30px 0;">
 
-        <div class="signup_row">
+        <div class="messaging-section" style="max-width: 800px; text-align: left;">
+            <h3>Subject Discussion</h3>
+            
+            <div class="message-display" style="background: #1a1a1a; height: 300px; overflow-y: auto; padding: 20px; border-radius: 8px; border: 1px solid #333; display: flex; flex-direction: column; gap: 10px;">
+                {% for msg in subject.messages %}
+                    <div class="msg {% if msg.sender_id == session['user_id'] %}msg-sent{% else %}msg-received{% endif %}">
+                        <strong style="color: #4CAF50; font-size: 0.8rem;">{{ msg.sender.username }}</strong><br>
+                        <span style="color: #eee;">{{ msg.content }}</span><br>
+                        <small style="color: #999; font-size: 0.6rem;">{{ msg.timestamp.strftime('%H:%M') }}</small>
+                    </div>
+                {% else %}
+                    <p style="color: #7d7c7c; text-align: center;">No messages yet.</p>
+                {% endfor %}
+            </div>
+
+            <form action="{{ url_for('send_message', subject_id=subject.subject_id) }}" method="POST" style="margin-top: 20px; display: flex; gap: 10px;">
+                <select name="receiver_id" required style="padding: 10px; border-radius: 5px; background: #333; color: white;">
+                    <option value="" disabled selected>Send to...</option>
+                    {% for member in subject.members %}
+                        {% if member.user_id != session['user_id'] %}
+                            <option value="{{ member.user_id }}">{{ member.user.username }}</option>
+                        {% endif %}
+                    {% endfor %}
+                    {% if subject.user_id != session['user_id'] %}
+                        <option value="{{ subject.user_id }}">Subject Owner</option>
+                    {% endif %}
+                </select>
+
+                <input type="text" name="content" placeholder="Type a message..." required 
+                       style="flex-grow: 1; padding: 10px; border-radius: 5px; border: none; background: #333; color: white;">
+                
+                <button type="submit" class="button_signup" style="width: auto; padding: 10px 20px;">Send</button>
+            </form>
+        </div>
+
+        <div class="signup_row" style="margin-top: 40px;">
             <a href="{{ url_for('dashboard') }}" class="button_signup" style="background-color: #555;">
                 Back to Dashboard
             </a>
         </div>
-        <div class="discussion-section" style="margin-top: 40px; text-align: left;">
-            <h3>Subject Discussion</h3>
-            <div class="message-box" style="background: #333; padding: 15px; border-radius: 8px; max-height: 300px; overflow-y: auto;">
-                {% for msg in subject.messages %}
-                    <p><strong>{{ msg.sender.username }}:</strong> {{ msg.content }} 
-                    <small style="color: #888;">{{ msg.timestamp.strftime('%H:%M') }}</small></p>
-                {% else %}
-                    <p style="color: #666;">No messages yet. Start the conversation!</p>
-                {% endfor %}
-            </div>
-
-            <form action="{{ url_for('send_message', subject_id=subject.subject_id) }}" method="POST" style="margin-top: 15px;">
-                <input type="text" name="content" placeholder="Type a message..." required 
-                    style="width: 80%; padding: 10px; border-radius: 5px; border: none;">
-                <button type="submit" class="button_signup" style="width: auto; padding: 10px;">Send</button>
-            </form>
-        </div>
     </main>
 </body>
-</html> 
+</html>

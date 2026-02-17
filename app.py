@@ -109,7 +109,7 @@ class SubjectMember(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=False)
     subject_id = db.Column(db.Integer, db.ForeignKey('subject.subject_id'), nullable=False)
-    # Status can be 'pending' or 'accepted'
+    # status accepted or not
     status = db.Column(db.String(20), default='pending') 
 
     user = db.relationship('User', backref='subject_memberships')
