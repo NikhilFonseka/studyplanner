@@ -74,6 +74,7 @@ class Task(db.Model):
     title = db.Column(db.String(50), nullable=False)
     description = db.Column(db.Text)
     due_date = db.Column(db.DateTime)
+    # captures task category like urgent or study
     tag = db.Column(db.String(20), default="General") 
     is_completed = db.Column(db.Boolean, default=False)
     subject_id = db.Column(
@@ -97,12 +98,12 @@ class Message(db.Model):
     content = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     
-    # Foreign Keys
+    # foreign Keys
     sender_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=False)
     receiver_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=False)
     subject_id = db.Column(db.Integer, db.ForeignKey('subject.subject_id'), nullable=False)
 
-    # Relationship to get the sender's name easily
+    # relationship to get the sender's name easily
     sender = db.relationship('User', foreign_keys=[sender_id], backref='sent_messages')
 
 class SubjectMember(db.Model):
@@ -209,9 +210,11 @@ def add_task():
     if request.method == 'POST':
         title = request.form.get('title')
         description = request.form.get('description')
+        # pulls the selected tag from the form
         tag = request.form.get('tag')  
         sub_id = request.form.get('subject_id')
         
+        # matches the date input name from addtaskhtml
         date_str = request.form.get('due_date_str') 
         
         due_date = None
@@ -219,6 +222,7 @@ def add_task():
             try:
                 due_date = datetime.strptime(date_str, '%Y-%m-%d')
             except ValueError:
+                # handles invalid date strings by setting to none
                 due_date = None 
 
 
@@ -332,6 +336,7 @@ def resetdb():
     with app.app_context():
         db.drop_all()
         db.create_all()
+        # logging completion of db reset
         print("database reset")
 
 
