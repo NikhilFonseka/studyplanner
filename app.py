@@ -98,12 +98,12 @@ class Message(db.Model):
     content = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     
-    # foreign Keys
+    # Foreign Keys
     sender_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=False)
     receiver_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=False)
     subject_id = db.Column(db.Integer, db.ForeignKey('subject.subject_id'), nullable=False)
 
-    # relationship to get the sender's name easily
+    # Relationship to get the sender's name easily
     sender = db.relationship('User', foreign_keys=[sender_id], backref='sent_messages')
 
 class SubjectMember(db.Model):

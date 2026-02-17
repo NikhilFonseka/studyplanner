@@ -49,6 +49,41 @@
             <p style="color: #888;">No tasks found.</p>
             {% endfor %}
         </ul>
+        <div class="subject_card" style="margin-top: 20px;">
+            <h3 style="color: white; margin-top: 0;">log study session</h3>
+            <form action="{{ url_for('log_session', subject_id=subject.subject_id) }}" method="POST">
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <input type="number" name="duration" placeholder="minutes (e.g. 45)" required 
+                        style="flex: 1; padding: 10px; background: #333; border: 1px solid #444; color: white; border-radius: 5px;">
+                    
+                    <button type="submit" class="button_signup" style="padding: 0 20px;">log session</button>
+                </div>
+                
+                <textarea name="notes" placeholder="what did you focus on during this session?" 
+                        style="width: 100%; padding: 10px; background: #333; border: 1px solid #444; color: white; border-radius: 5px; box-sizing: border-box;"></textarea>
+            </form>
+        </div>
+
+        <div class="subject_card" style="margin-top: 20px;">
+            <h3 style="color: white; margin-top: 0;">recent sessions</h3>
+            {% if subject.study_sessions %}
+                <div style="max-height: 300px; overflow-y: auto;">
+                    {% for s in subject.study_sessions|sort(attribute='start_time', reverse=True) %}
+                    <div style="padding: 10px 0; border-bottom: 1px solid #444; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <span style="color: #4CAF50; font-weight: bold;">{{ s.duration }} mins</span>
+                            <p style="margin: 5px 0 0 0; font-size: 0.85em; color: #888;">{{ s.notes if s.notes else 'no notes added' }}</p>
+                        </div>
+                        <div style="font-size: 0.8em; color: #666;">
+                            {{ s.start_time.strftime('%b %d, %H:%M') }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p style="color: #666; font-style: italic;">no study sessions recorded for this subject yet</p>
+            {% endif %}
+        </div>
 
         <hr style="border: 0; border-top: 1px solid #444; margin: 30px 0;">
 
