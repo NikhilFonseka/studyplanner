@@ -1,57 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="/static/style.css">
-    <title>W Notes+ | Add Task</title>
-</head>
-<body>
-    <div style="padding: 20px 0 0 20px;">
-        <h2 style="margin: 0; color: white;">W Notes +</h2>
-    </div>
+{% extends "base.html" %}
 
-    <main class="auth-container">
-        <h2 class="auth_title">Create New Task</h2>
-        
-        <form action="{{ url_for('add_task') }}" method="POST" class="auth_form">
-            <input type="hidden" name="subject_id" value="{{ request.args.get('subject_id') }}">
+{% block title %}add task{% endblock %}
 
-            <div class="form-group" style="margin-bottom: 15px;">
-                <label style="color: #bbb;">Task Title</label>
-                <input type="text" name="title" placeholder="e.g. Study for Midterm" required 
-                       style="width: 100%; padding: 10px; background: #333; border: 1px solid #444; color: white; border-radius: 5px;">
-            </div>
-
-            <div class="form-group" style="margin-bottom: 15px;">
-                <label style="color: #bbb;">Description (Optional)</label>
-                <textarea name="description" rows="3" placeholder="Add some details..." 
-                          style="width: 100%; padding: 10px; background: #333; border: 1px solid #444; color: white; border-radius: 5px;"></textarea>
-            </div>
-
-            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                <div style="flex: 1;">
-                    <label style="color: #bbb;">Due Date</label>
-                    <input type="date" name="due_date_str" 
-                           style="width: 100%; padding: 10px; background: #333; border: 1px solid #444; color: white; border-radius: 5px;">
-                </div>
-                <div style="flex: 1;">
-                    <label style="color: #bbb;">Task Tag</label>
-                    <select name="tag" style="width: 100%; padding: 10px; background: #333; border: 1px solid #444; color: white; border-radius: 5px;">
-                        <option value="General">General</option>
-                        <option value="Urgent">Urgent </option>
-                        <option value="Homework">Homework </option>
-                        <option value="Study">Study </option>
-                        <option value="Test">Test</option>
-                    </select>
-                </div>
-            </div>
-
-            <button type="submit" class="button_signup" style="width: 100%;">Create Task</button>
-        </form>
-
-        <div style="margin-top: 20px; text-align: center;">
-            <a href="{{ url_for('dashboard') }}" style="color: #888; text-decoration: none; font-size: 0.9em;">Cancel and go back</a>
-        </div>
-    </main>
-</body>
-</html>
+{% block content %}
+<div class="subject_card">
+    <h3 style="margin-top: 0;">create new task</h3>
+    <form action="{{ url_for('add_task') }}" method="POST">
+        <button type="submit" class="button_signup">add task</button>
+    </form>
+</div>
+{% endblock %}
