@@ -106,18 +106,15 @@ def seed_global_tags():
     db.session.commit()
 #Message model
 class Message(db.Model):
-    """Table for messages sent within a subject context."""
+    """Table for shared messages within a subject."""
     message_id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     
-    # FK
     sender_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=False)
-    receiver_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=True)
     subject_id = db.Column(db.Integer, db.ForeignKey('subject.subject_id'), nullable=False)
 
-    # Relationship to get the sender's name easily
-    sender = db.relationship('User', foreign_keys=[sender_id], backref='sent_messages')
+    sender = db.relationship('User', backref='sent_messages')
 #SubjectMember model
 class SubjectMember(db.Model):
     """Tracks which users have access to a subject and their invite status."""
@@ -249,10 +246,9 @@ def add_task():
         description = request.form.get('description')
         sub_id = request.form.get('subject_id')
         date_str = request.form.get('due_date_str')
-        # getlist captures all checked boxes from the form
+    
         selected_tag_ids = request.form.getlist('tag_ids')
 
-        # handle the date safely as planned
         due_date = None
         if date_str and date_str.strip():
             try:
@@ -282,42 +278,55 @@ def add_task():
     return render_template('addtask.html', subjects=user_subjects, tags=available_tags)
 
 
+
 @app.route('/subject/<int:subject_id>')
 def view_subject(subject_id):
-    """Handles view of a subject and its tasks with access control."""
+    """Streamlined view using relationships to avoid redundant queries."""
     if 'user_id' not in session:
         return redirect(url_for('signin'))
     
     user_id = session['user_id']
+    # .get_or_404 is best practice for direct ID lookups
     subject = Subject.query.get_or_404(subject_id)
 
-    is_owner = (subject.user_id == user_id)
-    membership = SubjectMember.query.filter_by(user_id=user_id, subject_id=subject_id, status='accepted').first()
+    # Security check: must be owner or accepted member
+    membership = SubjectMember.query.filter_by(
+        user_id=user_id, subject_id=subject_id, status='accepted'
+    ).first()
 
-    if not is_owner and not membership:
-        flash("You do not have access to this subject.")
+    if subject.user_id != user_id and not membership:
+        flash("Access denied.")
         return redirect(url_for('dashboard'))
 
-    messages = Message.query.filter_by(subject_id=subject_id).all()
+    # We fetch messages explicitly to order them by time
+    messages = Message.query.filter_by(subject_id=subject_id).order_by(Message.timestamp.asc()).all()
+    
     return render_template('viewsubject.html', subject=subject, messages=messages)
+
+@app.route('/send_message/<int:subject_id>', methods=['POST'])
+def send_message(subject_id):
+    content = request.form.get('content')
+    if content and content.strip():
+        new_msg = Message(
+            content=content,
+            sender_id=session['user_id'],
+            subject_id=subject_id
+        )
+        db.session.add(new_msg)
+        db.session.commit()
+    return redirect(url_for('view_subject', subject_id=subject_id))
 
 @app.route('/log_session/<int:subject_id>', methods=['POST'])
 def log_session(subject_id):
-    if 'user_id' not in session:
-        return redirect(url_for('signin'))
-    
-    duration = request.form.get('duration')
-    if duration:
-        # Create a new session linked to this subject
+    duration_raw = request.form.get('duration')
+    if duration_raw and duration_raw.isdigit():
         new_session = StudySession(
-            duration=int(duration),
+            duration=int(duration_raw),
             subject_id=subject_id
         )
         db.session.add(new_session)
         db.session.commit()
-    
     return redirect(url_for('view_subject', subject_id=subject_id))
-
 @app.route('/complete_task/<int:task_id>')
 def complete_task(task_id):
     """Task completion status."""
@@ -342,12 +351,15 @@ def delete_subject(subject_id):
 
 @app.route('/invite_user/<int:subject_id>', methods=['POST'])
 def invite_user(subject_id):
-    """Creates a pending request for another user to join a subject."""
-    email = request.form.get('email')
-    target_user = User.query.filter_by(email=email).first()
+    """Creates a pending request for another user via username."""
+    if 'user_id' not in session:
+        return redirect(url_for('signin'))
+    #gets username
+    username = request.form.get('username')
+    target_user = User.query.filter_by(username=username).first()
 
     if target_user:
-        # Check if they are already in the table (pending or accepted)
+        # Check for existing membership or pending invite
         exists = SubjectMember.query.filter_by(
             user_id=target_user.user_id, 
             subject_id=subject_id
@@ -357,35 +369,15 @@ def invite_user(subject_id):
             invite = SubjectMember(user_id=target_user.user_id, subject_id=subject_id)
             db.session.add(invite)
             db.session.commit()
-            flash("invite sent!")
+            flash(f"invite sent to {username}!")
         else:
-            flash("user already invited or joined.") 
+            flash("user is already a member or has a pending invite.") 
     else:
-        flash("user with that email not found.")
+        flash(f"user '{username}' not found.")
         
     return redirect(url_for('view_subject', subject_id=subject_id))
 
-@app.route('/send_message/<int:subject_id>', methods=['POST'])
-def send_message(subject_id):
-    if 'user_id' not in session:
-        return redirect(url_for('signin'))
-        
-    content = request.form.get('content')
-    # Use .get to ensure it doesn't crash if receiver is missing
-    receiver_id = request.form.get('receiver_id') 
-    
-    if content and content.strip():
-        new_msg = Message(
-            content=content,
-            sender_id=session['user_id'],
-            # Fixing the nullability for notes to self
-            receiver_id=receiver_id if receiver_id else None,
-            subject_id=subject_id
-        )
-        db.session.add(new_msg)
-        db.session.commit()
-    
-    return redirect(url_for('view_subject', subject_id=subject_id))
+
 
 
 @app.route('/accept_invite/<int:membership_id>')

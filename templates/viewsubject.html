@@ -1,5 +1,63 @@
-<h3 class="section_subtitle" style="margin-top: 30px;">share subject</h3>
-<form action="{{ url_for('invite_user', subject_id=subject.subject_id) }}" method="POST" style="display: flex; gap: 5px;">
-    <input type="email" name="email" placeholder="friend's email..." class="input_field" style="margin-bottom: 0;" required>
-    <button type="submit" class="button_signup" style="padding: 5px 10px; font-size: 0.8em;">send</button>
-</form>
+{% extends "base.html" %}
+{% block content %}
+    <h1 class="brand_title">{{ subject.name|lower }}</h1>
+    
+    <div class="view_container">
+        <div class="column_section">
+            <h3 class="section_subtitle">tasks</h3>
+            {% for task in subject.tasks %}
+                <div class="task_item">
+                    <span class="task_title">{{ task.title|lower }}</span>
+                    <div class="tags_container">
+                        {% for t in task.tags %}
+                            <span class="tag_badge">{{ t.name|lower }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% else %}
+                <p class="history_text">no tasks yet.</p>
+            {% endfor %}
+            <a href="{{ url_for('add_task') }}" class="secondary_link">+ new task</a>
+        </div>
+
+        <div class="column_section">
+            <h3 class="section_subtitle">shared feed</h3>
+            <div class="scroll_area">
+                {% for msg in messages %}
+                    <div class="message_box">
+                        <strong style="color: #ff6b4a;">{{ msg.sender.username|lower }}:</strong> 
+                        {{ msg.content|lower }}
+                    </div>
+                {% else %}
+                    <p class="history_text">start the conversation...</p>
+                {% endfor %}
+            </div>
+
+            <form action="{{ url_for('send_message', subject_id=subject.subject_id) }}" method="POST">
+                <input type="text" name="content" placeholder="send note to group..." class="input_field" required>
+            </form>
+
+            <h3 class="section_subtitle" style="margin-top: 30px;">history</h3>
+            <div class="scroll_area" style="max-height: 150px;">
+                {% for s in subject.study_sessions|sort(attribute='start_time', reverse=True) %}
+                    <div class="history_text">
+                        {{ s.duration }}m - {{ s.start_time.strftime('%b %d') }}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <form action="{{ url_for('log_session', subject_id=subject.subject_id) }}" method="POST" style="margin-top: 10px; display: flex; gap: 5px;">
+                <input type="number" name="duration" placeholder="min" class="input_field" style="width: 70px; margin-bottom: 0;">
+                <button type="submit" class="button_signup" style="padding: 5px 15px; font-size: 0.8em;">log</button>
+            </form>
+
+        <h3 class="section_subtitle" style="margin-top: 30px;">invite collaborators</h3>
+        <form action="{{ url_for('invite_user', subject_id=subject.subject_id) }}" method="POST" style="display: flex; gap: 5px;">
+            <input type="text" name="username" placeholder="friend's username..." class="input_field" style="margin-bottom: 0;" required>
+            <button type="submit" class="button_signup" style="padding: 5px 10px;">invite</button>
+        </form>
+        </div>
+    </div>
+    
+    <a href="{{ url_for('dashboard') }}" class="back_link">back to menu</a>
+{% endblock %}
