@@ -3,17 +3,28 @@
     <h1 class="brand_title">W Notes+</h1>
     <h2 class="view_title">new task</h2>
 
-    <div style="width: 300px;">
+    <div class="form_container">
         <form action="{{ url_for('add_task') }}" method="POST">
             <input type="text" name="title" placeholder="task name" class="input_field" required>
-            <input type="text" name="tag" placeholder="tag (e.g. urgent)" class="input_field">
+            
+            <p class="field_label">select tags:</p>
+            <div class="checkbox_group">
+                {% for t in tags %}
+                <label class="checkbox_item">
+                    <input type="checkbox" name="tag_ids" value="{{ t.tag_id }}">
+                    {{ t.name|lower }}
+                </label>
+                {% endfor %}
+            </div>
+
             <select name="subject_id" class="input_field">
                 {% for s in subjects %}
                     <option value="{{ s.subject_id }}">{{ s.name|lower }}</option>
                 {% endfor %}
             </select>
+            
             <input type="date" name="due_date_str" class="input_field">
-            <button type="submit" class="button_signup" style="width: 100%;">save task</button>
+            <button type="submit" class="button_signup full_width_btn">save task</button>
         </form>
     </div>
 {% endblock %}

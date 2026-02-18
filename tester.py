@@ -5,7 +5,7 @@ Proves authentication, navigation, an integrity.
 """
 
 import pytest
-from app import app, db, User, Subject, StudySession, resetdb
+from app import app, db, Subject, StudySession, resetdb
 
 @pytest.fixture
 def client():
@@ -113,3 +113,4 @@ def test_messaging_system(client):
 
 if __name__ == '__main__':
     pytest.main([__file__])
+    resetdb()

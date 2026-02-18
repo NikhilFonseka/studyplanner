@@ -1,50 +1,5 @@
-{% extends "base.html" %}
-{% block content %}
-    <h1 class="brand_title">{{ subject.name|lower }}</h1>
-    
-    <div style="display: flex; gap: 50px; margin-top: 30px; width: 90%; max-width: 900px;">
-        <div style="flex: 1;">
-            <h3 style="color: #444;">tasks</h3>
-            {% for task in subject.tasks %}
-                <div style="padding: 12px 0; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
-                    <span>
-                        {{ task.title|lower }} 
-                        {% if task.tag %}<span class="tag_badge">{{ task.tag|lower }}</span>{% endif %}
-                    </span>
-                    <a href="{{ url_for('complete_task', task_id=task.task_id) }}" style="color: #ff6b4a; text-decoration: none;">done</a>
-                </div>
-            {% endfor %}
-            <a href="{{ url_for('add_task') }}" style="display: block; margin-top: 15px; color: #888; text-decoration: none;">+ new task</a>
-
-            <h3 style="color: #444; margin-top: 40px;">study log</h3>
-            <form action="{{ url_for('log_session', subject_id=subject.subject_id) }}" method="POST" style="display: flex; gap: 10px;">
-                <input type="number" name="duration" placeholder="mins" class="input_field" style="flex: 1;">
-                <button type="submit" class="button_signup">log</button>
-            </form>
-        </div>
-
-        <div style="flex: 1;">
-            {% if messages %}
-                <h3 style="color: #444;">messages</h3>
-                <div style="max-height: 200px; overflow-y: auto; margin-bottom: 10px;">
-                    {% for msg in messages %}
-                        <div class="message_box">{{ msg.content|lower }}</div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-
-            <form action="{{ url_for('send_message', subject_id=subject.subject_id) }}" method="POST">
-                <input type="text" name="content" placeholder="send note..." class="input_field">
-            </form>
-
-            <h3 style="color: #444; margin-top: 30px;">history</h3>
-            {% for s in subject.study_sessions|sort(attribute='start_time', reverse=True) %}
-                <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">
-                    {{ s.duration }}m - {{ s.start_time.strftime('%b %d') }}
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-    
-    <a href="{{ url_for('dashboard') }}" style="margin-top: 50px; color: #888; text-decoration: none;">back to menu</a>
-{% endblock %}
+<h3 class="section_subtitle" style="margin-top: 30px;">share subject</h3>
+<form action="{{ url_for('invite_user', subject_id=subject.subject_id) }}" method="POST" style="display: flex; gap: 5px;">
+    <input type="email" name="email" placeholder="friend's email..." class="input_field" style="margin-bottom: 0;" required>
+    <button type="submit" class="button_signup" style="padding: 5px 10px; font-size: 0.8em;">send</button>
+</form>

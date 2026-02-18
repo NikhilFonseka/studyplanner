@@ -1,22 +1,31 @@
 {% extends "base.html" %}
 {% block content %}
-    <div style="width: 90%; max-width: 900px; text-align: right; margin-top: 20px;">
-        <a href="{{ url_for('logout') }}" style="color: #888; text-decoration: none; font-size: 0.9em;">logout</a>
-    </div>
+    <h1 class="brand_title">w notes+</h1>
+    <h2 class="view_title">welcome, {{ username }}</h2>
 
-    <h1 class="brand_title">W Notes+</h1>
-    <h2 class="view_title">Select Subject</h2>
-
-    <div class="form_container" style="display: flex; flex-direction: column; align-items: center;">
-        {% for subject in subjects %}
-        <a href="{{ url_for('view_subject', subject_id=subject.subject_id) }}" class="subject_button">
-            {{ subject.name|lower }}
-        </a>
+    {% if invites %}
+    <div class="form_container" style="margin-bottom: 30px; border: 1px solid #ff6b4a; padding: 15px; border-radius: 10px;">
+        <h3 class="section_subtitle" style="color: #ff6b4a;">pending invites</h3>
+        {% for invite in invites %}
+            <div class="message_box" style="display: flex; justify-content: space-between; align-items: center;">
+                <span>join <strong>{{ invite.subject.name|lower }}</strong>?</span>
+                <div>
+                    <a href="{{ url_for('handle_invite', membership_id=invite.id, action='accept') }}" class="button_signup" style="padding: 5px 10px; font-size: 0.7em;">accept</a>
+                    <a href="{{ url_for('handle_invite', membership_id=invite.id, action='decline') }}" style="color: #888; font-size: 0.7em; text-decoration: none; margin-left: 10px;">decline</a>
+                </div>
+            </div>
         {% endfor %}
-        
-        <a href="{{ url_for('add_subject') }}" 
-           style="color: #888; text-align: center; margin-top: 30px; text-decoration: none; font-size: 0.9em;">
-            + add new subject
-        </a>
     </div>
+    {% endif %}
+
+    <div class="subject_list">
+        {% for s in subjects %}
+            <a href="{{ url_for('view_subject', subject_id=s.subject_id) }}" class="subject_button">
+                {{ s.name|lower }}
+            </a>
+        {% endfor %}
+    </div>
+
+    <a href="{{ url_for('add_subject') }}" class="secondary_link" style="margin-top: 30px;">+ add subject</a>
+    <a href="{{ url_for('logout') }}" class="back_link">logout</a>
 {% endblock %}

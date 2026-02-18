@@ -96,6 +96,14 @@ class Tag(db.Model):
 
     tag_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20), nullable=False)
+
+def seed_global_tags():
+    core_options = ['urgent', 'exam', 'general']
+    for name in core_options:
+        if not Tag.query.filter_by(name=name).first():
+            new_tag = Tag(name=name)
+            db.session.add(new_tag)
+    db.session.commit()
 #Message model
 class Message(db.Model):
     """Table for messages sent within a subject context."""
@@ -175,92 +183,124 @@ def logout():
 #Controller for dashboard
 @app.route('/dashboard')
 def dashboard():
-    """Handles the dashboard."""
+    """Handles the dashboard with personal and shared subjects."""
     user_id = session.get('user_id')
     if user_id:
         user = db.session.get(User, user_id)
-        user_subs = Subject.query.filter_by(user_id=user_id).all()
+
+        owned_subs = Subject.query.filter_by(user_id=user_id).all()
+        
+        accepted_memberships = SubjectMember.query.filter_by(user_id=user_id, status='accepted').all()
+        shared_subs = [m.subject for m in accepted_memberships]
+        
+        pending_invites = SubjectMember.query.filter_by(user_id=user_id, status='pending').all()
+
         return render_template(
-            'home.html', username=user.username, subjects=user_subs
+            'home.html', 
+            username=user.username, 
+            subjects=owned_subs + shared_subs,
+            invites=pending_invites
         )
     flash("Please login to access the dashboard.")
     return redirect(url_for('signin'))
 
-#Add Subject Controller
 @app.route('/add_subject', methods=['GET', 'POST'])
 def add_subject():
-    """Handles new subject creation."""
     if 'user_id' not in session:
         return redirect(url_for('signin'))
+        
     if request.method == 'POST':
         name = request.form.get('name')
         color = request.form.get('color')
-        new_subject = Subject(
-            name=name, color_tag=color, user_id=session['user_id']
-        )
+        user_id = session['user_id']
+        
+
+        new_subject = Subject(name=name, color_tag=color, user_id=user_id)
         db.session.add(new_subject)
+
+        db.session.flush() 
+        
+        owner_member = SubjectMember(
+            user_id=user_id, 
+            subject_id=new_subject.subject_id, 
+            status='accepted'
+        )
+        db.session.add(owner_member)
+        
         db.session.commit()
         return redirect(url_for('dashboard'))
+        
     return render_template('addsubject.html')
 
 #Add task controller
 @app.route('/add_task', methods=['GET', 'POST'])
 def add_task():
-    """Adds a task to a specific subject with date validation and tagging"""
     if 'user_id' not in session:
         return redirect(url_for('signin'))
-    
-    user_subjects = Subject.query.filter_by(user_id=session['user_id']).all()
-    #fetches info for tags
+
+
+    user_id = session['user_id']
+    memberships = SubjectMember.query.filter_by(user_id=user_id, status='accepted').all()
+    user_subjects = [m.subject for m in memberships]
+    available_tags = Tag.query.all()
+
     if request.method == 'POST':
         title = request.form.get('title')
         description = request.form.get('description')
-        # pulls the selected tag from the form
-        tag = request.form.get('tag')  
         sub_id = request.form.get('subject_id')
-        # matches the date input name from addtaskhtml
-        date_str = request.form.get('due_date_str') 
-        
+        date_str = request.form.get('due_date_str')
+        # getlist captures all checked boxes from the form
+        selected_tag_ids = request.form.getlist('tag_ids')
+
+        # handle the date safely as planned
         due_date = None
         if date_str and date_str.strip():
             try:
                 due_date = datetime.strptime(date_str, '%Y-%m-%d')
             except ValueError:
-                # handles invalid date strings by setting to none
-                due_date = None 
+                due_date = None
 
-        #create new task
+        # create the task object
         new_task = Task(
-            title=title, 
-            description=description, 
-            tag=tag, 
-            due_date=due_date, 
-            subject_id=sub_id, 
+            title=title,
+            description=description,
+            due_date=due_date,
+            subject_id=sub_id,
             user_id=session['user_id']
         )
-        
+
+        # link each selected tag to the task
+        for t_id in selected_tag_ids:
+            tag_obj = db.session.get(Tag, t_id)
+            if tag_obj:
+                new_task.tags.append(tag_obj)
+
         db.session.add(new_task)
         db.session.commit()
-        
-
         return redirect(url_for('view_subject', subject_id=sub_id))
-        
-    return render_template('addtask.html', subjects=user_subjects)
+
+    return render_template('addtask.html', subjects=user_subjects, tags=available_tags)
 
 
 @app.route('/subject/<int:subject_id>')
 def view_subject(subject_id):
-    """Handles view of a subject and its tasks"""
+    """Handles view of a subject and its tasks with access control."""
     if 'user_id' not in session:
         return redirect(url_for('signin'))
-    subject = Subject.query.filter_by(
-        subject_id=subject_id, user_id=session['user_id']
-    ).first()
-    if not subject:
-        return "Unauthorized Access", 403
-    messages = Message.query.filter_by(subject_id=subject_id).all()
+    
+    user_id = session['user_id']
+    subject = Subject.query.get_or_404(subject_id)
 
+    is_owner = (subject.user_id == user_id)
+    membership = SubjectMember.query.filter_by(user_id=user_id, subject_id=subject_id, status='accepted').first()
+
+    if not is_owner and not membership:
+        flash("You do not have access to this subject.")
+        return redirect(url_for('dashboard'))
+
+    messages = Message.query.filter_by(subject_id=subject_id).all()
     return render_template('viewsubject.html', subject=subject, messages=messages)
+
 @app.route('/log_session/<int:subject_id>', methods=['POST'])
 def log_session(subject_id):
     if 'user_id' not in session:
@@ -307,7 +347,7 @@ def invite_user(subject_id):
     target_user = User.query.filter_by(email=email).first()
 
     if target_user:
-        # Check if they are already invited
+        # Check if they are already in the table (pending or accepted)
         exists = SubjectMember.query.filter_by(
             user_id=target_user.user_id, 
             subject_id=subject_id
@@ -317,9 +357,12 @@ def invite_user(subject_id):
             invite = SubjectMember(user_id=target_user.user_id, subject_id=subject_id)
             db.session.add(invite)
             db.session.commit()
-            flash("Invite sent!")
+            flash("invite sent!")
+        else:
+            flash("user already invited or joined.") 
     else:
-        flash("User not found.")
+        flash("user with that email not found.")
+        
     return redirect(url_for('view_subject', subject_id=subject_id))
 
 @app.route('/send_message/<int:subject_id>', methods=['POST'])
@@ -328,13 +371,15 @@ def send_message(subject_id):
         return redirect(url_for('signin'))
         
     content = request.form.get('content')
+    # Use .get to ensure it doesn't crash if receiver is missing
     receiver_id = request.form.get('receiver_id') 
     
-    if content:
+    if content and content.strip():
         new_msg = Message(
             content=content,
             sender_id=session['user_id'],
-            receiver_id=receiver_id,
+            # Fixing the nullability for notes to self
+            receiver_id=receiver_id if receiver_id else None,
             subject_id=subject_id
         )
         db.session.add(new_msg)
@@ -365,4 +410,5 @@ if __name__ == '__main__':
     validate_templates()
     with app.app_context():
         db.create_all()
+        seed_global_tags()
     app.run(debug=True)
