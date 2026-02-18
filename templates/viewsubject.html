@@ -53,7 +53,7 @@
 
         <h3 class="section_subtitle" style="margin-top: 30px;">invite collaborators</h3>
         <form action="{{ url_for('invite_user', subject_id=subject.subject_id) }}" method="POST" style="display: flex; gap: 5px;">
-            <input type="text" name="username" placeholder="friend's username..." class="input_field" style="margin-bottom: 0;" required>
+            <input type="text" name="username" placeholder="Enter reciptient" class="input_field" style="margin-bottom: 0;" required>
             <button type="submit" class="button_signup" style="padding: 5px 10px;">invite</button>
         </form>
         </div>

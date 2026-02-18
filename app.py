@@ -180,25 +180,27 @@ def logout():
 #Controller for dashboard
 @app.route('/dashboard')
 def dashboard():
-    """Handles the dashboard with personal and shared subjects."""
     user_id = session.get('user_id')
     if user_id:
         user = db.session.get(User, user_id)
 
         owned_subs = Subject.query.filter_by(user_id=user_id).all()
         
-        accepted_memberships = SubjectMember.query.filter_by(user_id=user_id, status='accepted').all()
-        shared_subs = [m.subject for m in accepted_memberships]
+        others_memberships = SubjectMember.query.filter(
+            SubjectMember.user_id == user_id, 
+            SubjectMember.status == 'accepted'
+        ).all()
+        
+        shared_subs = [m.subject for m in others_memberships if m.subject.user_id != user_id]
         
         pending_invites = SubjectMember.query.filter_by(user_id=user_id, status='pending').all()
 
         return render_template(
             'home.html', 
             username=user.username, 
-            subjects=owned_subs + shared_subs,
+            subjects=owned_subs + shared_subs, 
             invites=pending_invites
         )
-    flash("Please login to access the dashboard.")
     return redirect(url_for('signin'))
 
 @app.route('/add_subject', methods=['GET', 'POST'])
@@ -207,14 +209,21 @@ def add_subject():
         return redirect(url_for('signin'))
         
     if request.method == 'POST':
-        name = request.form.get('name')
+        name = request.form.get('name').strip() # Get the name
         color = request.form.get('color')
         user_id = session['user_id']
-        
+
+        existing = Subject.query.filter(
+            Subject.user_id == user_id, 
+            db.func.lower(Subject.name) == db.func.lower(name)
+        ).first()
+
+        if existing:
+            flash(f"Subject '{name}' already exists!")
+            return redirect(url_for('dashboard'))
 
         new_subject = Subject(name=name, color_tag=color, user_id=user_id)
         db.session.add(new_subject)
-
         db.session.flush() 
         
         owner_member = SubjectMember(
@@ -223,7 +232,6 @@ def add_subject():
             status='accepted'
         )
         db.session.add(owner_member)
-        
         db.session.commit()
         return redirect(url_for('dashboard'))
         
@@ -394,7 +402,6 @@ def resetdb():
     with app.app_context():
         db.drop_all()
         db.create_all()
-        # logging completion of db reset
         print("database reset")
 
 
