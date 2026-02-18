@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
+    <div style="width: 90%; max-width: 900px; text-align: right; margin-top: 20px;">
+        <a href="{{ url_for('logout') }}" style="color: #888; text-decoration: none; font-size: 0.9em;">logout</a>
+    </div>
+
     <h1 class="brand_title">W Notes+</h1>
     <h2 class="view_title">Select Subject</h2>
 
@@ -8,12 +12,11 @@
         <a href="{{ url_for('view_subject', subject_id=subject.subject_id) }}" class="subject_button">
             {{ subject.name|lower }}
         </a>
-            </a>
         {% endfor %}
         
         <a href="{{ url_for('add_subject') }}" 
            style="color: #888; text-align: center; margin-top: 30px; text-decoration: none; font-size: 0.9em;">
-           + add new subject
+            + add new subject
         </a>
     </div>
 {% endblock %}

@@ -3,11 +3,11 @@
 W Notes+ is a flask based webapp
 used as a all in one study tool that aims to maximise studying efficiency
 """
-
+#standard lib
 import os
 import sys
 from datetime import datetime
-
+#non standard lib
 from flask import (
     Flask, render_template, request, redirect, url_for, flash, session
 )
@@ -16,7 +16,7 @@ from sqlalchemy import or_, text
 from werkzeug.security import generate_password_hash, check_password_hash
 from jinja2 import Environment, FileSystemLoader, exceptions
 
-
+#Checks if any templates have invalid synthax program
 def validate_templates():
     """Validates Jinja syntax to prevent errors during runtime."""
     template_dir = os.path.join(os.path.dirname(__file__), 'templates')
@@ -29,10 +29,11 @@ def validate_templates():
         except exceptions.TemplateSyntaxError:
             errors += 1
     if errors > 0:
+        #Prevents rest of the file runninng when Errors are found since this function happens first in the if __name__ = main
         print(f"Validation failed with {errors} errors")
         sys.exit()
 
-
+#Setup flask webapp with SQLite
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -40,12 +41,14 @@ app.secret_key = 'readingthiskeys'
 db = SQLAlchemy(app)
 
 
-# Models
+#needed for 2nf many to many
 task_tags = db.Table('task_tags',
     db.Column('task_id', db.Integer, db.ForeignKey('task.task_id'), primary_key=True),
     db.Column('tag_id', db.Integer, db.ForeignKey('tag.tag_id'), primary_key=True)
 )
+#Models
 
+#User Model
 class User(db.Model):
     """Table for application users."""
 
@@ -54,10 +57,10 @@ class User(db.Model):
     email = db.Column(db.String(50), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
 
-
+#Subject Model
 class Subject(db.Model):
     """Table for subjects, linked to users."""
-
+    study_sessions = db.relationship('StudySession', backref='subject', lazy=True)
     subject_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     color_tag = db.Column(db.String(20))
@@ -65,8 +68,7 @@ class Subject(db.Model):
         db.Integer, db.ForeignKey('user.user_id'), nullable=False
     )
     tasks = db.relationship('Task', backref='subject', lazy=True)
-
-
+#Task Model
 class Task(db.Model):
     """Table for tasks, linked to subjects."""
 
@@ -77,39 +79,38 @@ class Task(db.Model):
     # captures task category like urgent or study
     tag = db.Column(db.String(20), default="General") 
     is_completed = db.Column(db.Boolean, default=False)
-    subject_id = db.Column(
-        db.Integer, db.ForeignKey('subject.subject_id'), nullable=False
-    )
-    user_id = db.Column(
-        db.Integer, db.ForeignKey('user.user_id'), nullable=False
-    )
+    #FK
+    subject_id = db.Column(db.Integer, db.ForeignKey('subject.subject_id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=False)
+    #many to many
     tags = db.relationship('Tag', secondary=task_tags, backref=db.backref('tasks', lazy='dynamic'))
+#StudySession model
 class StudySession(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     duration = db.Column(db.Integer, nullable=False)
     start_time = db.Column(db.DateTime, default=db.func.now())
     subject_id = db.Column(db.Integer, db.ForeignKey('subject.subject_id'), nullable=False)
-
+#Task tag model
 class Tag(db.Model):
     """Table for task tags for task categories or tags"""
 
     tag_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20), nullable=False)
-
+#Message model
 class Message(db.Model):
     """Table for messages sent within a subject context."""
     message_id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     
-    # Foreign Keys
+    # FK
     sender_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=False)
     receiver_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=True)
     subject_id = db.Column(db.Integer, db.ForeignKey('subject.subject_id'), nullable=False)
 
     # Relationship to get the sender's name easily
     sender = db.relationship('User', foreign_keys=[sender_id], backref='sent_messages')
-
+#SubjectMember model
 class SubjectMember(db.Model):
     """Tracks which users have access to a subject and their invite status."""
     id = db.Column(db.Integer, primary_key=True)
@@ -120,13 +121,13 @@ class SubjectMember(db.Model):
 
     user = db.relationship('User', backref='subject_memberships')
     subject = db.relationship('Subject', backref='members')
-
+#Controller for the default ip route
 @app.route('/')
 def index():
     """Redirects start URL to the sign-in page."""
     return redirect(url_for('signin'))
 
-
+#Controller for sign up 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     """Handles new user registration"""
@@ -143,7 +144,7 @@ def signup():
         return redirect(url_for('signin'))
     return render_template('signup.html')
 
-
+#Controller for sign up 
 @app.route('/signin', methods=['GET', 'POST'])
 def signin():
     """Authenticates users and manages session login"""
@@ -163,7 +164,7 @@ def signin():
         return render_template('signin.html'), 401
     return render_template('signin.html')
 
-
+#Controller for log out
 @app.route('/logout')
 def logout():
     """Handles logging out (removing user from session)"""
@@ -171,7 +172,7 @@ def logout():
     flash("You have been logged out.")
     return redirect(url_for('signin'))
 
-
+#Controller for dashboard
 @app.route('/dashboard')
 def dashboard():
     """Handles the dashboard."""
@@ -185,7 +186,7 @@ def dashboard():
     flash("Please login to access the dashboard.")
     return redirect(url_for('signin'))
 
-
+#Add Subject Controller
 @app.route('/add_subject', methods=['GET', 'POST'])
 def add_subject():
     """Handles new subject creation."""
@@ -202,7 +203,7 @@ def add_subject():
         return redirect(url_for('dashboard'))
     return render_template('addsubject.html')
 
-
+#Add task controller
 @app.route('/add_task', methods=['GET', 'POST'])
 def add_task():
     """Adds a task to a specific subject with date validation and tagging"""
@@ -210,14 +211,13 @@ def add_task():
         return redirect(url_for('signin'))
     
     user_subjects = Subject.query.filter_by(user_id=session['user_id']).all()
-    
+    #fetches info for tags
     if request.method == 'POST':
         title = request.form.get('title')
         description = request.form.get('description')
         # pulls the selected tag from the form
         tag = request.form.get('tag')  
         sub_id = request.form.get('subject_id')
-        
         # matches the date input name from addtaskhtml
         date_str = request.form.get('due_date_str') 
         
@@ -229,7 +229,7 @@ def add_task():
                 # handles invalid date strings by setting to none
                 due_date = None 
 
-
+        #create new task
         new_task = Task(
             title=title, 
             description=description, 
