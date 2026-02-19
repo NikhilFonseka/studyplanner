@@ -1,21 +1,24 @@
 {% extends "base.html" %}
-{% block title %}new subject{% endblock %}
 
 {% block content %}
-    <h1 class="brand_title">W Notes+</h1>
-    <h2 class="view_title">new subject</h2>
-
-    <div style="width: 300px;">
-        <form action="{{ url_for('add_subject') }}" method="POST">
-            <input type="text" name="name" placeholder="subject name e.g Math" class="input_field" required>
-            
-            <div style="text-align: left; margin-bottom: 5px;">
-                <label style="font-size: 0.8em; color: #888;">theme color</label>
-            </div>
-            <input type="color" name="color" class="input_field" style="height: 45px; padding: 5px; cursor: pointer;">
-            
-            <button type="submit" class="button_signup" style="width: 100%;">create</button>
-        </form>
-        <a href="{{ url_for('dashboard') }}" style="display: block; text-align: center; margin-top: 20px; color: #888; text-decoration: none; font-size: 0.8em;">cancel</a>
-    </div>
+<div class="form_container lowercase">
+    <h1 class="brand_title">new subject</h1>
+    
+    <form method="POST">
+        <label class="field_label">subject name</label>
+        <input type="text" name="name" class="input_field" placeholder="e.g. biology" required>
+        
+        <label class="field_label">theme color</label>
+        <select name="color_id" class="input_field" required>
+            <option value="" disabled selected>select color...</option>
+            {% for color in colors %}
+                <option value="{{ color.id }}">{{ color.name }}</option>
+            {% endfor %}
+        </select>
+        
+        <button type="submit" class="button_signup full_width_btn">create subject</button>
+    </form>
+    
+    <a href="{{ url_for('dashboard') }}" class="back_link">cancel</a>
+</div>
 {% endblock %}

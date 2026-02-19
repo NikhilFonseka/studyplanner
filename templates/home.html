@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+
 {% block content %}
     <h1 class="brand_title">W notes+</h1>
     <h2 class="view_title">welcome, {{ username }}</h2>
@@ -10,21 +11,24 @@
             <div class="message_box" style="display: flex; justify-content: space-between; align-items: center;">
                 <span>join <strong>{{ invite.subject.name|lower }}</strong>?</span>
                 <div>
-                    <a href="{{ url_for('handle_invite', membership_id=invite.id, action='accept') }}" class="button_signup" style="padding: 5px 10px; font-size: 0.7em;">accept</a>
-                    <a href="{{ url_for('handle_invite', membership_id=invite.id, action='decline') }}" style="color: #888; font-size: 0.7em; text-decoration: none; margin-left: 10px;">decline</a>
+                    <a href="{{ url_for('accept_invite', membership_id=invite.id) }}" class="button_signup" style="padding: 5px 10px; font-size: 0.7em;">accept</a>
                 </div>
             </div>
         {% endfor %}
     </div>
     {% endif %}
 
-    <div class="subject_list">
+    <div class="dashboard_grid">
         {% for s in subjects %}
-            <a href="{{ url_for('view_subject', subject_id=s.subject_id) }}" class="subject_button">
-                {{ s.name|lower }}
-            </a>
+        <a href="{{ url_for('view_subject', subject_id=s.subject_id) }}" 
+        class="subject_card" 
+        style="--subject-color: {{ s.color.hex_code if s.color else '#444' }};">
+            <h3 class="subject_card_title">{{ s.name|lower }}</h3>
+            <p style="color: #888; font-size: 12px;">{{ s.tasks|length }} tasks</p>
+        </a>
         {% endfor %}
     </div>
+
 
     <a href="{{ url_for('add_subject') }}" class="secondary_link" style="margin-top: 30px;">+ add subject</a>
     <a href="{{ url_for('logout') }}" class="back_link">logout</a>
