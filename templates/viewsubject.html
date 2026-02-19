@@ -22,7 +22,7 @@
         </div>
 
         <div class="column_section">
-            <h3 class="section_subtitle">shared feed</h3>
+            <h3 class="section_subtitle">Notes</h3>
             <div class="scroll_area feed_height">
                 {% for msg in messages %}
                     <div class="message_box">
@@ -30,12 +30,12 @@
                         {{ msg.content }}
                     </div>
                 {% else %}
-                    <p class="history_text">start the conversation...</p>
+                    <p class="history_text">Create first note</p>
                 {% endfor %}
             </div>
 
             <form action="{{ url_for('send_message', subject_id=subject.subject_id) }}" method="POST" class="bottom_margin_20">
-                <input type="text" name="content" placeholder="send note to group..." class="input_field full_width" required>
+                <input type="text" name="content" placeholder="Enter notes here" class="input_field full_width" required>
             </form>
 
             <h3 class="section_subtitle">history</h3>
@@ -63,11 +63,15 @@
     </div>
 
     <div class="footer_actions">
-        <a href="{{ url_for('dashboard') }}" class="back_link">← back to menu</a>
-        <a href="{{ url_for('delete_subject', subject_id=subject.subject_id) }}" 
-           class="delete_link" 
-           onclick="return confirm('Are you sure? This will delete all tasks and messages.')">
-           delete subject
-        </a>
+        <a href="{{ url_for('dashboard') }}" class="back_link">back to menu</a>
+        
+        {# Only show this to the person who actually created the subject #}
+        {% if subject.user_id == session['user_id'] %}
+            <a href="{{ url_for('delete_subject', subject_id=subject.subject_id) }}" 
+            class="delete_link" 
+            onclick="return confirm('Are you sure? This will delete all tasks and messages.')">
+            delete subject
+            </a>
+        {% endif %}
     </div>
 {% endblock %}

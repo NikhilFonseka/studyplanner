@@ -47,16 +47,16 @@ def parse_date(date_str):
             return None
     return None
 
-# --- Database Models (3NF) ---
+# Database Models (3NF) 
 
 class Color(db.Model):
-    # Stores hex codes so we don't hardcode styles in the DB
+    # Stores hex codes don't hardcode styles in the DB
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20))
     hex_code = db.Column(db.String(7))
 
 class Status(db.Model):
-    # e.g., 'Pending', 'In Progress', 'Done'
+    # Status for tasks
     id = db.Column(db.Integer, primary_key=True)
     label = db.Column(db.String(20)) 
 
@@ -257,8 +257,6 @@ def log_session(subject_id):
     duration_raw = request.form.get('duration')
     if not duration_raw or not duration_raw.isdigit() or int(duration_raw) <= 0:
         flash("Please enter valid positive minutes.")
-    elif int(duration_raw) > 720:
-        flash("Whoa! Session exceeds 12-hour limit.")
     else:
         new_session = StudySession(duration=int(duration_raw), subject_id=subject_id)
         db.session.add(new_session)
