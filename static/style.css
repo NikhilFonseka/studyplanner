@@ -1,12 +1,21 @@
+
+* {
+    box-sizing: border-box;
+}
+
 body { 
     background-color: #ffffff; 
-    font-family: Arial, sans-serif; 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
     margin: 0; 
     display: flex;
     flex-direction: column;
     align-items: center;
     min-height: 100vh;
+    color: #333;
+    line-height: 1.5;
+    text-transform: lowercase; 
 }
+
 
 .brand_title {
     color: #ff6b4a; 
@@ -17,187 +26,133 @@ body {
 
 .view_title {
     color: #444;
-    font-size: 35px;
+    font-size: 32px;
     font-weight: normal;
-    margin-bottom: 50px;
-    text-transform: lowercase;
-}
-
-.dashboard_container {
-    width: 90%;
-    max-width: 1000px;
-    margin-top: 40px;
-}
-
-.header_row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    margin-bottom: 30px;
-}
-
-.dashboard_grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
-    width: 100%;
-}
-
-.subject_card {
-    background-color: #ffffff;
-    padding: 25px;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    text-decoration: none;
-    color: #333;
-    display: block;
-    border-left: 8px solid var(--subject-color); 
-}
-
-
-.subject_card_title {
-    margin: 0;
-    font-size: 22px;
-    color: #444;
-}
-
-.subject_card_stats {
-    color: #888;
-    font-size: 13px;
-    margin-top: 12px;
-}
-
-/* --- Form Elements --- */
-.form_container {
-    width: 300px;
-}
-
-.input_field {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 10px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    box-sizing: border-box;
-    background-color: #f9f9f9;
-}
-
-.field_label {
-    margin: 10px 0 5px;
-    font-size: 14px;
-    color: #666;
-    display: block;
-}
-
-.button_signup {
-    background-color: #444;
-    color: #ff6b4a;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    text-align: center;
-    text-decoration: none;
-    font-size: 16px;
-}
-
-.btn_primary {
-    background-color: #ff6b4a;
-    color: white;
-    padding: 12px 24px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-size: 16px;
-    border: none;
-    cursor: pointer;
-}
-
-.full_width_btn {
-    width: 100%;
-}
-
-/* --- Layout Sections --- */
-.view_container {
-    display: flex; 
-    gap: 50px; 
-    margin-top: 30px; 
-    width: 90%; 
-    max-width: 900px;
-}
-
-.column_section {
-    flex: 1;
+    margin-bottom: 40px;
 }
 
 .section_subtitle {
     color: #444;
     font-size: 18px;
     margin-bottom: 15px;
+    font-weight: 600;
 }
+
+.dashboard_grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+    width: 90%;
+    max-width: 1000px;
+    margin-top: 20px;
+}
+
+.subject_card {
+    background-color: #ffffff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    text-decoration: none;
+    color: #333;
+    display: block;
+    /* 3NF Integration: Uses the hex_code from the Color table */
+    border-left: 8px solid var(--subject-color, #444);
+}
+
+/* --- Form Elements --- */
+.form_container {
+    width: 320px;
+    display: flex;
+    flex-direction: column;
+}
+
+.input_field {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+}
+
+.button_signup {
+    background-color: #ff6b4a;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.full_width_btn { width: 100%; }
+.btn_small { padding: 5px 15px; font-size: 13px; }
+
+/* --- Subject View Layout --- */
+.view_container { 
+    display: flex; 
+    gap: 40px; 
+    width: 90%; 
+    max-width: 950px; 
+    margin-top: 20px;
+}
+
+.column_section { flex: 1; }
 
 .scroll_area {
-    max-height: 300px; 
-    overflow-y: auto; 
-    margin-bottom: 15px;
-    background: #fdfdfd;
-    padding: 10px;
-    border: 1px solid #eee;
-    border-radius: 8px;
-}
-
-/* --- Tasks & Tags --- */
-.tag_badge {
-    background-color: #f0f0f0;
-    color: #555;
-    padding: 2px 10px;
-    margin-left: 8px;
-    border-radius: 12px;
-    font-size: 10px;
-    display: inline-block;
-    border: 1px solid #ddd;
-}
-
-.checkbox_group {
+    border: 1px solid #f0f0f0;
+    padding: 15px;
+    border-radius: 10px;
+    background: #fafafa;
     margin-bottom: 15px;
 }
 
-.checkbox_item {
-    display: block;
+.feed_height { height: 200px; overflow-y: auto; }
+.history_height { max-height: 150px; overflow-y: auto; }
+
+.task_item { 
+    margin-bottom: 15px; 
+    padding: 10px; 
+    border-bottom: 1px solid #eee; 
+}
+
+.task_title { font-weight: bold; font-size: 16px; }
+
+.tag_badge { 
+    font-size: 11px; 
+    background: #eeeeee; 
+    padding: 2px 5px; 
+    border-radius: 4px; 
+    margin-right: 6px;
+    color: #666;
+}
+
+.message_box { margin-bottom: 8px; font-size: 14px; }
+
+.history_text_item {
+    font-size: 14px;
+    color: #666;
     margin-bottom: 5px;
-    font-size: 14px;
 }
 
 
-.message_box {
-    background-color: #f4f4f4;
-    padding: 10px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    font-size: 14px;
+.footer_actions {
+    margin-top: 30px;
+    display: flex;
+    gap: 20px;
+    align-items: center;
 }
 
-.history_text {
-    font-size: 12px; 
-    color: #999; 
-    margin-top: 5px;
-}
+.back_link { text-decoration: none; color: #666; font-size: 14px; }
+.delete_link { color: #ff4a4a; text-decoration: none; font-size: 14px; margin-left: 20px; }
 
-.secondary_link {
-    display: block; 
-    margin-top: 15px; 
-    color: #888; 
-    text-decoration: none;
-    font-size: 14px;
-}
-
-.back_link {
-    margin-top: 50px; 
-    color: #888; 
-    text-decoration: none;
-    font-size: 16px;
-}
-
-.lowercase {
-    text-transform: lowercase;
-}
+.flex_row { display: flex; gap: 5px; }
+.flex_grow { flex-grow: 1; }
+.no_margin { margin-bottom: 0; }
+.bottom_margin_20 { margin-bottom: 20px; }
+.bottom_margin_25 { margin-bottom: 25px; }
+.full_width { width: 100%; }
+.short_input { width: 80px; }
+.secondary_link { color: #ff6b4a; text-decoration: none; display: block; margin-top: 10px; }

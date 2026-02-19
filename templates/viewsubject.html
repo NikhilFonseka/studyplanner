@@ -1,36 +1,32 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1 class="brand_title" style="text-transform: lowercase;">{{ subject.name }}</h1>
+    <h1 class="brand_title">{{ subject.name }}</h1>
     
-    <div class="view_container" style="display: flex; gap: 40px; text-transform: lowercase;">
-        
-        <div class="column_section" style="flex: 1;">
+    <div class="view_container">
+        <div class="column_section">
             <h3 class="section_subtitle">tasks</h3>
             {% for task in subject.tasks %}
-                <div class="task_item" style="margin-bottom: 15px; padding: 10px; border-bottom: 1px solid #eee;">
-                    <span class="task_title" style="font-weight: bold;">{{ task.title }}</span>
+                <div class="task_item">
+                    <span class="task_title">{{ task.title }}</span>
                     <div class="tags_container">
                         {% for t in task.tags %}
-                            <span class="tag_badge" style="font-size: 0.7em; background: #eee; padding: 2px 5px; border-radius: 4px;">
-                                {{ t.name }}
-                            </span>
+                            <span class="tag_badge">{{ t.name }}</span>
                         {% endfor %}
                     </div>
                 </div>
             {% else %}
                 <p class="history_text">no tasks yet.</p>
             {% endfor %}
-            <a href="{{ url_for('add_task') }}" class="secondary_link" style="color: #ff6b4a;">+ new task</a>
+            <a href="{{ url_for('add_task') }}" class="secondary_link">+ new task</a>
         </div>
 
-        <div class="column_section" style="flex: 1;">
-            
+        <div class="column_section">
             <h3 class="section_subtitle">shared feed</h3>
-            <div class="scroll_area" style="height: 200px; overflow-y: auto; border: 1px solid #f0f0f0; padding: 10px; margin-bottom: 10px;">
+            <div class="scroll_area feed_height">
                 {% for msg in messages %}
-                    <div class="message_box" style="margin-bottom: 8px;">
-                        <strong style="color: #ff6b4a;">{{ msg.sender.username }}:</strong> 
+                    <div class="message_box">
+                        <strong class="accent_text">{{ msg.sender.username }}:</strong> 
                         {{ msg.content }}
                     </div>
                 {% else %}
@@ -38,14 +34,14 @@
                 {% endfor %}
             </div>
 
-            <form action="{{ url_for('send_message', subject_id=subject.subject_id) }}" method="POST" style="margin-bottom: 20px;">
-                <input type="text" name="content" placeholder="send note to group..." class="input_field" style="width: 100%;" required>
+            <form action="{{ url_for('send_message', subject_id=subject.subject_id) }}" method="POST" class="bottom_margin_20">
+                <input type="text" name="content" placeholder="send note to group..." class="input_field full_width" required>
             </form>
 
             <h3 class="section_subtitle">history</h3>
-            <div class="scroll_area" style="max-height: 150px; overflow-y: auto; margin-bottom: 10px;">
+            <div class="scroll_area history_height">
                 {% for s in subject.study_sessions|sort(attribute='start_time', reverse=True) %}
-                    <div class="history_text" style="font-size: 0.9em; color: #666;">
+                    <div class="history_text_item">
                         {{ s.duration }}m — {{ s.start_time.strftime('%b %d, %I:%M %p') }}
                     </div>
                 {% else %}
@@ -53,17 +49,25 @@
                 {% endfor %}
             </div>
 
-            <form action="{{ url_for('log_session', subject_id=subject.subject_id) }}" method="POST" style="display: flex; gap: 5px; margin-bottom: 25px;">
-                <input type="number" name="duration" placeholder="mins" min="1" max="720" required style="width: 80px;">
-                <button type="submit" class="button_signup" style="padding: 5px 15px; font-size: 0.8em;">log</button>
+            <form action="{{ url_for('log_session', subject_id=subject.subject_id) }}" method="POST" class="flex_row bottom_margin_25">
+                <input type="number" name="duration" placeholder="mins" min="1" max="720" required class="short_input">
+                <button type="submit" class="button_signup btn_small">log</button>
             </form>
 
             <h3 class="section_subtitle">invite collaborators</h3>
-            <form action="{{ url_for('invite_user', subject_id=subject.subject_id) }}" method="POST" style="display: flex; gap: 5px;">
-                <input type="text" name="username" placeholder="enter username" class="input_field" style="flex-grow: 1; margin-bottom: 0;" required>
-                <button type="submit" class="button_signup" style="padding: 5px 10px;">invite</button>
+            <form action="{{ url_for('invite_user', subject_id=subject.subject_id) }}" method="POST" class="flex_row">
+                <input type="text" name="username" placeholder="enter username" class="input_field no_margin flex_grow" required>
+                <button type="submit" class="button_signup">invite</button>
             </form>
-        </div> </div> <div style="margin-top: 30px;">
-        <a href="{{ url_for('dashboard') }}" class="back_link" style="text-decoration: none; color: #666;">← back to menu</a>
+        </div>
+    </div>
+
+    <div class="footer_actions">
+        <a href="{{ url_for('dashboard') }}" class="back_link">← back to menu</a>
+        <a href="{{ url_for('delete_subject', subject_id=subject.subject_id) }}" 
+           class="delete_link" 
+           onclick="return confirm('Are you sure? This will delete all tasks and messages.')">
+           delete subject
+        </a>
     </div>
 {% endblock %}
