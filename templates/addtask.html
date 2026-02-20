@@ -7,6 +7,17 @@
         <form action="{{ url_for('add_task') }}" method="POST">
             <input type="text" name="title" placeholder="task name" class="input_field" required>
             
+            <div class="flex_row" style="margin-bottom: 0.938rem;">
+                <select name="priority_id" class="input_field flex_grow" style="margin-bottom: 0;" required>
+                    <option value="" disabled selected>priority...</option>
+                    {% for p in priorities %}
+                        <option value="{{ p.id }}">{{ p.level|lower }}</option>
+                    {% endfor %}
+                </select>
+                
+                <div class="flex_grow"></div>
+            </div>
+
             <p class="field_label">select tags:</p>
             <div class="checkbox_group">
                 {% for t in tags %}

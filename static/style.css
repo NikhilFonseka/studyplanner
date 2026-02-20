@@ -59,7 +59,19 @@ body {
     display: flex;
     flex-direction: column;
 }
+.space_between {
+    justify-content: space-between;
+}
 
+.align_center {
+    align-items: center;
+}
+
+/* Ensure the task header looks right */
+.task_header {
+    display: flex;
+    gap: 0.5rem; /* rem units for spacing */
+}
 .input_field {
     width: 100%;
     padding: 0.75rem;
@@ -137,6 +149,36 @@ body {
     gap: 1.25rem;
     align-items: center;
 }
+.status_badge {
+    font-size: 0.688rem;
+    background: #e8f5e9;
+    font-weight: 600;
+}
+
+.priority_badge {
+    font-size: 0.688rem;
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.25rem;
+    background: #fff5f2;
+    color: #ff6b4a;
+    border: 0.063rem solid #ffeadb;
+}
+
+
+.btn_complete {
+    background: #f0f0f0;
+    border: 0.063rem solid #ddd;
+    color: #666;
+    padding: 0.125rem 0.5rem;
+    font-size: 0.688rem;
+    display: inline-block;
+}
+
+.task_completed .task_title {
+    text-decoration: line-through;
+    color: #aaa;
+}
+
 
 .back_link { text-decoration: none; color: #666; font-size: 0.875rem; }
 .delete_link { color: #ff4a4a; text-decoration: none; font-size: 0.875rem; margin-left: 1.25rem; }
@@ -149,3 +191,4 @@ body {
 .full_width { width: 100%; }
 .short_input { width: 5rem; }
 .secondary_link { color: #ff6b4a; text-decoration: none; display: block; margin-top: 0.625rem; }
+

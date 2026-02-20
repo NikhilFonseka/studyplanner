@@ -1,41 +1,60 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1 class="brand_title">{{ subject.name }}</h1>
+    <h1 class="brand_title">{{ subject.name|lower }}</h1>
     
     <div class="view_container">
         <div class="column_section">
             <h3 class="section_subtitle">tasks</h3>
-            {% for task in subject.tasks %}
-                <div class="task_item">
-                    <span class="task_title">{{ task.title }}</span>
-                    <div class="tags_container">
-                        {% for t in task.tags %}
-                            <span class="tag_badge">{{ t.name }}</span>
-                        {% endfor %}
+            
+            <div class="scroll_area feed_height">
+                {% for task in tasks %}
+                    <div class="task_item {% if task.status_id == 2 %}task_completed{% endif %}">
+                        <div class="flex_row space_between align_center">
+                            <span class="task_title">{{ task.title|lower }}</span>
+                            
+                            <div class="flex_row align_center">
+                                {% if task.priority %}
+                                    <span class="priority_badge">{{ task.priority.level|lower }}</span>
+                                {% endif %}
+                                
+                                {% if task.status_id != 2 %}
+                                    <a href="{{ url_for('complete_task', task_id=task.task_id) }}" class="btn_complete">done</a>
+                                {% else %}
+                                    <span class="status_badge">completed</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="tags_container">
+                            {% for t in task.tags %}
+                                <span class="tag_badge">{{ t.name|lower }}</span>
+                            {% endfor %}
+                        </div>
                     </div>
-                </div>
-            {% else %}
-                <p class="history_text">no tasks yet.</p>
-            {% endfor %}
+                {% else %}
+                    <p class="history_text">no tasks yet.</p>
+                {% endfor %}
+            </div>
+            
             <a href="{{ url_for('add_task') }}" class="secondary_link">+ new task</a>
         </div>
 
         <div class="column_section">
-            <h3 class="section_subtitle">Notes</h3>
+            <h3 class="section_subtitle">notes</h3>
             <div class="scroll_area feed_height">
                 {% for msg in messages %}
                     <div class="message_box">
-                        <strong class="accent_text">{{ msg.sender.username }}:</strong> 
+                        <strong class="accent_text">{{ msg.sender.username|lower }}:</strong> 
                         {{ msg.content }}
                     </div>
                 {% else %}
-                    <p class="history_text">Create first note</p>
+                    <p class="history_text">create first note</p>
                 {% endfor %}
             </div>
 
             <form action="{{ url_for('send_message', subject_id=subject.subject_id) }}" method="POST" class="bottom_margin_20">
-                <input type="text" name="content" placeholder="Enter notes here" class="input_field full_width" required>
+                <input type="text" name="content" placeholder="enter notes here" class="input_field full_width" required>
             </form>
 
             <h3 class="section_subtitle">history</h3>
@@ -65,12 +84,11 @@
     <div class="footer_actions">
         <a href="{{ url_for('dashboard') }}" class="back_link">back to menu</a>
         
-        {# Only show this to the person who actually created the subject #}
         {% if subject.user_id == session['user_id'] %}
             <a href="{{ url_for('delete_subject', subject_id=subject.subject_id) }}" 
-            class="delete_link" 
-            onclick="return confirm('Are you sure? This will delete all tasks and messages.')">
-            delete subject
+               class="delete_link" 
+               onclick="return confirm('Are you sure? This will delete all tasks and messages.')">
+               delete subject
             </a>
         {% endif %}
     </div>

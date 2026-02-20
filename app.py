@@ -20,10 +20,9 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = 'readingthiskeys'
 db = SQLAlchemy(app)
 
-# --- Logic Helpers ---
 
 def get_nzt_now():
-    # Force the +13 hour offset for New Zealand Daylight Time
+    # UCT+13 for New Zealand Daylight Time
     nz_offset = timezone(timedelta(hours=13))
     return datetime.now(nz_offset)
 
@@ -128,7 +127,7 @@ class SubjectMember(db.Model):
     user = db.relationship('User', backref='subject_memberships')
     subject = db.relationship('Subject', backref='members')
 
-# --- Routes ---
+# Routes 
 
 @app.route('/')
 def index():
@@ -173,13 +172,27 @@ def logout():
 def dashboard():
     user_id = session['user_id']
     user = db.session.get(User, user_id)
-    # Get subjects I own + subjects I've been invited to/accepted
+
     owned_subs = Subject.query.filter_by(user_id=user_id).all()
-    others_memberships = SubjectMember.query.filter(SubjectMember.user_id == user_id, SubjectMember.status == 'accepted').all()
-    shared_subs = [m.subject for m in others_memberships if m.subject.user_id != user_id]
-    pending_invites = SubjectMember.query.filter_by(user_id=user_id, status='pending').all()
     
-    return render_template('home.html', username=user.username, subjects=owned_subs + shared_subs, invites=pending_invites)
+    others_memberships = SubjectMember.query.filter(
+        SubjectMember.user_id == user_id, 
+        SubjectMember.status == 'accepted'
+    ).all()
+    shared_subs = [m.subject for m in others_memberships if m.subject.user_id != user_id]
+    all_subjects = owned_subs + shared_subs
+    pending_invites = SubjectMember.query.filter_by(user_id=user_id, status='pending').all()
+    subject_data = []
+    for s in all_subjects:
+        active_count = Task.query.filter_by(subject_id=s.subject_id).filter(Task.status_id != 2).count()
+        subject_data.append({
+            'info': s,
+            'active_tasks': active_count
+        })
+    return render_template('home.html', 
+                           username=user.username, 
+                           subjects=subject_data, 
+                           invites=pending_invites)
 
 @app.route('/add_subject', methods=['GET', 'POST'])
 @login_required
@@ -215,8 +228,9 @@ def add_task():
     # Only let users add tasks to subjects they actually belong to
     memberships = SubjectMember.query.filter_by(user_id=user_id, status='accepted').all()
     user_subjects = [m.subject for m in memberships]
+
     available_tags = Tag.query.all()
-    
+    available_priorities = Priority.query.order_by(Priority.weight.asc()).all()
     if request.method == 'POST':
         due_date = parse_date(request.form.get('due_date_str'))
         new_task = Task(
@@ -224,7 +238,9 @@ def add_task():
             description=request.form.get('description'),
             due_date=due_date,
             subject_id=request.form.get('subject_id'),
-            user_id=user_id
+            user_id=user_id,
+            priority_id=request.form.get('priority_id')
+            
         )
         # Link multiple tags from the checkbox list
         for t_id in request.form.getlist('tag_ids'):
@@ -233,7 +249,9 @@ def add_task():
         db.session.add(new_task)
         db.session.commit()
         return redirect(url_for('view_subject', subject_id=new_task.subject_id))
-    return render_template('addtask.html', subjects=user_subjects, tags=available_tags)
+    return render_template('addtask.html', subjects=user_subjects,
+                           tags=available_tags,
+                           priorities=available_priorities)
 
 @app.route('/subject/<int:subject_id>')
 @login_required
@@ -246,9 +264,11 @@ def view_subject(subject_id):
     if subject.user_id != user_id and not membership:
         flash("Access denied.")
         return redirect(url_for('dashboard'))
+    
+    sorted_tasks = Task.query.join(Priority).filter(Task.subject_id == subject_id).order_by(Task.status_id.asc(), Priority.weight.asc()).all()
         
     messages = Message.query.filter_by(subject_id=subject_id).order_by(Message.timestamp.asc()).all()
-    return render_template('viewsubject.html', subject=subject, messages=messages)
+    return render_template('viewsubject.html', subject=subject,tasks=sorted_tasks, messages=messages)
 
 @app.route('/log_session/<int:subject_id>', methods=['POST'])
 @login_required
@@ -308,18 +328,36 @@ def delete_subject(subject_id):
     db.session.commit()
     flash(f"Subject '{subject.name}' deleted.")
     return redirect(url_for('dashboard'))
+@app.route('/complete_task/<int:task_id>')
+@login_required
+def complete_task(task_id):
+    task = db.session.get(Task, task_id) or abort(404)
 
+    if task.user_id != session['user_id']:
+        flash("Permission denied.")
+        return redirect(url_for('dashboard'))
+
+    task.status_id = 2
+    db.session.commit()
+    
+    return redirect(url_for('view_subject', subject_id=task.subject_id))
 # DB setup
 
 def lookup_data():
-    # Populate the fixed options if the DB is empty
+    # adds options if the DB is empty eg fresh reset
     if not Tag.query.first():
         db.session.add_all([Tag(name='urgent'), Tag(name='exam'), Tag(name='general')])
     if not Priority.query.first():
-        db.session.add_all([Priority(level='urgent', weight=1), Priority(level='normal', weight=2), Priority(level='low', weight=3)])
+        db.session.add_all([Priority(level='high', weight=1), Priority(level='normal', weight=2), Priority(level='low', weight=3)])
     if not Color.query.first():
         db.session.add_all([Color(name='blue', hex_code='#007BFF'), Color(name='orange', hex_code='#FF6B4A'), Color(name='green', hex_code='#28A745')])
+    if not Status.query.first():
+        db.session.add_all([
+            Status(id=1, label='pending'),
+            Status(id=2, label='completed')
+        ])
     db.session.commit()
+    
 
 def resetdb():
     """Wipes the database and recreates the structure. 

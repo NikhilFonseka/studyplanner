@@ -10,7 +10,7 @@
         
         <label class="field_label">theme color</label>
         <select name="color_id" class="input_field" required>
-            <option value="" disabled selected>select color...</option>
+            <option value="" disabled selected>select color</option>
             {% for color in colors %}
                 <option value="{{ color.id }}">{{ color.name }}</option>
             {% endfor %}
