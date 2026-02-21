@@ -6,12 +6,8 @@ body {
     background-color: #ffffff; 
     font-family: 'Helvetica'; 
     margin: 0; 
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     min-height: 100vh;
     color: #333;
-    line-height: 1.5;
 }
 
 .brand_title {
@@ -84,7 +80,6 @@ body {
     padding: 0.75rem;
     margin-bottom: 0.938rem;
     border: 0.063rem solid #ddd;
-    border-radius: 0.375rem;
     font-size: 0.875rem;
     outline: none;
 }
@@ -92,11 +87,9 @@ body {
 .button_signup {
     background-color: #ff6b4a;
     color: white;
-    border: none;
     padding: 0.75rem 1.25rem;
-    border-radius: 0.375rem;
+    border: 0.375rem;
     font-size: 1rem;
-    cursor: pointer;
     text-align: center;
 }
 
@@ -116,7 +109,6 @@ body {
 .scroll_area {
     border: 0.063rem solid #f0f0f0;
     padding: 0.938rem;
-    border-radius: 0.625rem;
     background: #fafafa;
     margin-bottom: 0.938rem;
 }
@@ -136,7 +128,7 @@ body {
     font-size: 0.688rem; 
     background: #eeeeee; 
     padding: 0.125rem 0.313rem; 
-    border-radius: 0.25rem; 
+    border: 0.25rem; 
     margin-right: 0.375rem;
     color: #666;
 }
@@ -159,7 +151,7 @@ body {
     margin-bottom: 1.875rem; 
     border: 0.063rem solid #ff6b4a; 
     padding: 0.938rem; 
-    border-radius: 0.625rem;
+    border: 0.625rem;
 }
 .btn_tiny {
     padding: 0.313rem 0.625rem; 
@@ -176,7 +168,6 @@ body {
 .priority_badge {
     font-size: 0.688rem;
     padding: 0.125rem 0.5rem;
-    border-radius: 0.25rem;
     background: #fff5f2;
     color: #ff6b4a;
     border: 0.063rem solid #ffeadb;
@@ -205,7 +196,7 @@ body {
     vertical-align: middle;
 }
 .back_link { text-decoration: none; color: #666; font-size: 0.875rem; }
-.delete_link { color: #ff4a4a; text-decoration: none; font-size: 0.875rem; margin-left: 1.25rem; }
+.delete_link { color: #ff4a4a; text-decoration: none; font-size: 2rem; margin-left: -12.25rem; }
 
 .flex_row { display: flex; gap: 0.313rem; }
 .flex_grow { flex-grow: 1; }
@@ -216,3 +207,69 @@ body {
 .short_input { width: 5rem; }
 .secondary_link { color: #ff6b4a; text-decoration: none; display: block; margin-top: 0.625rem; }
 
+
+.sidebar {
+    width: 15rem;
+    background-color: #fafafa;
+    border-right: 0.063rem solid #eee;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem 1.25rem;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+}
+.sidebar_footer {
+    margin-top: auto; 
+    padding-top: 1rem;
+}
+
+.logout_link {
+    text-decoration: none;
+    color: #ff4a4a; 
+    font-weight: 500;
+    font-size: 1.2rem;
+}
+.sidebar_links {
+    list-style: none;
+    padding: 0;
+    margin: 2rem 0;
+    flex-grow: 1;
+}
+
+.sidebar_links li {
+    margin-bottom: 1rem;
+}
+
+.sidebar_links a {
+    text-decoration: none;
+    color: #444;
+    font-weight: 500;
+    font-size: 1.5rem;
+
+}
+
+
+body { 
+    background-color: #ffffff; 
+    font-family: 'Helvetica'; 
+    margin: 0; 
+    min-height: 100vh;
+    color: #333;
+}
+
+.app_layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.main_content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* This centers your Signup/Login forms */
+    padding: 2rem;
+}
+.main_content .brand_title {
+    margin-top: 0;
+}

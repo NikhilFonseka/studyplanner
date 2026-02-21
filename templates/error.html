@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="form_container align_center" style="text-align: center; margin-top: 5rem;">
+    <h1 class="brand_title" style="font-size: 5rem;">{{ code }}</h1>
+    <h2 class="view_title">{{ message }}</h2>
+    
+    <p class="history_text" style="margin-bottom: 2rem;">
+        {{ description }}
+    </p>
+
+    <a href="{{ url_for('dashboard') }}" class="button_signup">Go back to site</a>
+</div>
+{% endblock %}

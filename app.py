@@ -1,17 +1,14 @@
 # pylint: disable=R0903
 """
 W Notes+ | Sprint 3
-used as a all in one study tool that aims to maximise studying efficiency.
+Used as a all in one study tool that aims to maximise studying efficiency.
 """
-import os
-import sys
 from functools import wraps
 from datetime import datetime, timezone, timedelta
 from flask import Flask, render_template, request, redirect, url_for, flash, session, abort
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import or_
 from werkzeug.security import generate_password_hash, check_password_hash
-from jinja2 import Environment, FileSystemLoader, exceptions
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
@@ -37,7 +34,7 @@ def login_required(f):
 
 def parse_date(date_str):
     # Returns None if the user leaves the date empty or types something weird
-    # This acts as our primary error handle for task deadlines
+    # This acts as the primary error handle for task deadlines
     if date_str and date_str.strip():
         try:
             return datetime.strptime(date_str, '%Y-%m-%d')
@@ -127,10 +124,27 @@ class SubjectMember(db.Model):
     user = db.relationship('User', backref='subject_memberships')
 
 # Routes 
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('error.html', 
+        code=404, 
+        message="404 page not found", 
+        description="The page you're looking for doesn't exist or has been moved."), 404
+
+
+@app.errorhandler(500)
+def server_error(e):
+    return render_template('error.html', 
+        code=500, 
+        message="internal glitch", 
+        description="Something went wrong on our end. We're looking into it."), 500
 
 @app.route('/')
 def index():
-    return redirect(url_for('signin'))
+    if 'user_id' in session:
+        return redirect(url_for('dashboard'))
+    else:
+        return redirect(url_for('signin'))
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -387,4 +401,4 @@ if __name__ == '__main__':
         db.create_all()
         lookup_data()
     # Debug mode on for local dev
-    app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=False)
+    app.run(host='0.0.0.0', port=5000, debug=False, use_reloader=False)

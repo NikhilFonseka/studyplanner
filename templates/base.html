@@ -1,19 +1,49 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>W Notes+</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}W Notes+{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <main>
-        {% block content %}{% endblock %}
-    </main>
-        {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            {% for message in messages %}
-                <div class="flash">{{message}}</div>
-            {% endfor %}
-          {% endif %}
-        {% endwith %}
+    <div class="app_layout">
+        
+        {# Only show sidebar if the user is authenticated #}
+        {% if session.get('user_id') %}
+        <nav class="sidebar">
+            <div class="sidebar_header">
+                <h2 class="brand_title" style="font-size: 1.5rem; margin: 0;">W+</h2>
+            </div>
+            
+            <ul class="sidebar_links">
+                <li><a href="{{ url_for('dashboard') }}">dashboard</a></li>
+                <li><a href="{{ url_for('add_task') }}">new task</a></li>
+                <li><a href="{{ url_for('add_subject') }}">new subject</a></li>
+            </ul>
+
+            <div class="sidebar_footer">
+                <a href="{{ url_for('logout') }}" class="logout_link">logout</a>
+            </div>
+        </nav>
+        {% endif %}
+
+        {# The 'main_content' class in your CSS handles the centering #}
+        <main class="main_content">
+            
+            {# Flash messages section #}
+            {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                <div class="flash_container">
+                    {% for message in messages %}
+                        <div class="flash">{{ message }}</div>
+                    {% endfor %}
+                </div>
+              {% endif %}
+            {% endwith %}
+            {% block content %}{% endblock %}
+            
+        </main>
+    </div>
 </body>
 </html>

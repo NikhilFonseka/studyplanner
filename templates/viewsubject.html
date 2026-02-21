@@ -81,9 +81,7 @@
         </div>
     </div>
 
-    <div class="footer_actions">
-        <a href="{{ url_for('dashboard') }}" class="back_link">back to menu</a>
-        
+    <div>
         {% if subject.user_id == session['user_id'] %}
             <a href="{{ url_for('delete_subject', subject_id=subject.subject_id) }}" 
                class="delete_link" 
