@@ -4,8 +4,10 @@
     <h2 class="view_title">new task</h2>
 
     <div class="form_container">
-        <form action="{{ url_for('add_task') }}" method="POST">
+        <form action="{{ url_for('tasks.add_task') }}" method="POST">
             <input type="text" name="title" placeholder="task name" class="input_field" required>
+            
+            <textarea name="description" placeholder="task description (40 characters max)" class="input_field" rows="3" maxlength="40" style="resize: vertical;"></textarea>
             
             <div class="flex_row" style="margin-bottom: 0.938rem;">
                 <select name="priority_id" class="input_field flex_grow" style="margin-bottom: 0;" required>
@@ -14,7 +16,6 @@
                         <option value="{{ p.id }}">{{ p.level|lower }}</option>
                     {% endfor %}
                 </select>
-                
                 <div class="flex_grow"></div>
             </div>
 
@@ -27,7 +28,7 @@
                 </label>
                 {% endfor %}
             </div>
-
+            <p class="field_label">select subject:</p>
             <select name="subject_id" class="input_field">
                 {% for s in subjects %}
                     <option value="{{ s.subject_id }}">{{ s.name|lower }}</option>

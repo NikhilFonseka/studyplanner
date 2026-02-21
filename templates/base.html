@@ -17,13 +17,13 @@
             </div>
             
             <ul class="sidebar_links">
-                <li><a href="{{ url_for('dashboard') }}">dashboard</a></li>
-                <li><a href="{{ url_for('add_task') }}">new task</a></li>
-                <li><a href="{{ url_for('add_subject') }}">new subject</a></li>
+                <li><a href="{{ url_for('main.dashboard') }}">dashboard</a></li>
+                <li><a href="{{ url_for('tasks.add_task') }}">new task</a></li>
+                <li><a href="{{ url_for('main.add_subject') }}">new subject</a></li>
             </ul>
 
             <div class="sidebar_footer">
-                <a href="{{ url_for('logout') }}" class="logout_link">logout</a>
+                <a href="{{ url_for('auth.logout') }}" class="logout_link">logout</a>
             </div>
         </nav>
         {% endif %}

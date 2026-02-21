@@ -113,7 +113,7 @@ body {
     margin-bottom: 0.938rem;
 }
 
-.feed_height { height: 12.5rem; overflow-y: auto; }
+.feed_height { height: 20.5rem; overflow-y: auto; }
 .history_height { max-height: 9.375rem; overflow-y: auto; }
 
 .task_item { 
@@ -196,7 +196,7 @@ body {
     vertical-align: middle;
 }
 .back_link { text-decoration: none; color: #666; font-size: 0.875rem; }
-.delete_link { color: #ff4a4a; text-decoration: none; font-size: 2rem; margin-left: -12.25rem; }
+.delete_link { color: #ff4a4a; text-decoration: none; font-size: 2rem; margin-left: -20.25rem; padding-top: 10rem;}
 
 .flex_row { display: flex; gap: 0.313rem; }
 .flex_grow { flex-grow: 1; }

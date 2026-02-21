@@ -19,12 +19,18 @@
                                 {% endif %}
                                 
                                 {% if task.status_id != 2 %}
-                                    <a href="{{ url_for('complete_task', task_id=task.task_id) }}" class="btn_complete">done</a>
+                                    <a href="{{ url_for('tasks.complete_task', task_id=task.task_id) }}" class="btn_complete">done</a>
                                 {% else %}
                                     <span class="status_badge">completed</span>
                                 {% endif %}
                             </div>
                         </div>
+
+                        {% if task.description %}
+                        <div class="task_description" style="margin: 0.313rem 0; font-size: 0.85rem; color: #666; font-style: italic;">
+                            {{ task.description }}
+                        </div>
+                        {% endif %}
 
                         <div class="tags_container">
                             {% for t in task.tags %}
@@ -37,7 +43,7 @@
                 {% endfor %}
             </div>
             
-            <a href="{{ url_for('add_task') }}" class="secondary_link">+ new task</a>
+            <a href="{{ url_for('tasks.add_task') }}" class="secondary_link">+ new task</a>
         </div>
 
         <div class="column_section">
@@ -53,7 +59,7 @@
                 {% endfor %}
             </div>
 
-            <form action="{{ url_for('send_message', subject_id=subject.subject_id) }}" method="POST" class="bottom_margin_20">
+            <form action="{{ url_for('main.send_message', subject_id=subject.subject_id) }}" method="POST" class="bottom_margin_20">
                 <input type="text" name="content" placeholder="enter notes here" class="input_field full_width" required>
             </form>
 
@@ -68,26 +74,26 @@
                 {% endfor %}
             </div>
 
-            <form action="{{ url_for('log_session', subject_id=subject.subject_id) }}" method="POST" class="flex_row bottom_margin_25">
+            <form action="{{ url_for('main.log_session', subject_id=subject.subject_id) }}" method="POST" class="flex_row bottom_margin_25">
                 <input type="number" name="duration" placeholder="mins" min="0" required class="short_input">
                 <button type="submit" class="button_signup btn_small">log</button>
             </form>
 
             <h3 class="section_subtitle">invite collaborators</h3>
-            <form action="{{ url_for('invite_user', subject_id=subject.subject_id) }}" method="POST" class="flex_row">
+            <form action="{{ url_for('main.invite_user', subject_id=subject.subject_id) }}" method="POST" class="flex_row bottom_margin_25">
                 <input type="text" name="username" placeholder="enter username" class="input_field no_margin flex_grow" required>
                 <button type="submit" class="button_signup">invite</button>
             </form>
-        </div>
-    </div>
 
-    <div>
-        {% if subject.user_id == session['user_id'] %}
-            <a href="{{ url_for('delete_subject', subject_id=subject.subject_id) }}" 
-               class="delete_link" 
-               onclick="return confirm('Are you sure? This will delete all tasks and messages.')">
-               delete subject
-            </a>
-        {% endif %}
+            <div style="margin-top: auto;">
+                {% if subject.user_id == session['user_id'] %}
+                    <a href="{{ url_for('main.delete_subject', subject_id=subject.subject_id) }}" 
+                    class="delete_link" 
+                    onclick="return confirm('Are you sure? This will delete all tasks and messages.')">
+                    delete subject
+                    </a>
+                {% endif %}
+            </div>
+        </div>
     </div>
 {% endblock %}
