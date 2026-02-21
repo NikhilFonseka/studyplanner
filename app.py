@@ -85,6 +85,7 @@ class Subject(db.Model):
     # Cleanup tasks/sessions if a subject is deleted
     tasks = db.relationship('Task', backref='subject', lazy=True, cascade="all, delete-orphan")
     study_sessions = db.relationship('StudySession', backref='subject', lazy=True, cascade="all, delete-orphan")
+    members = db.relationship('SubjectMember', backref='subject', lazy=True, cascade="all, delete-orphan")
 
 class Task(db.Model):
     task_id = db.Column(db.Integer, primary_key=True)
@@ -124,7 +125,6 @@ class SubjectMember(db.Model):
     subject_id = db.Column(db.Integer, db.ForeignKey('subject.subject_id'), nullable=False)
     status = db.Column(db.String(20), default='pending') 
     user = db.relationship('User', backref='subject_memberships')
-    subject = db.relationship('Subject', backref='members')
 
 # Routes 
 
