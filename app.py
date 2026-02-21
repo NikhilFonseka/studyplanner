@@ -1,8 +1,7 @@
 # pylint: disable=R0903
 """
 W Notes+ | Sprint 3
-This is our main app script. We're using a 3NF DB structure 
-and forcing NZDT (UTC+13) for all our timestamps.
+used as a all in one study tool that aims to maximise studying efficiency.
 """
 import os
 import sys
@@ -136,15 +135,29 @@ def index():
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
-        # Grab form data and hash the password before saving
         user = request.form.get('username')
         email_address = request.form.get('email')
         password = request.form.get('password')
+
+
+        existing_user = User.query.filter(
+            (User.username == user) | (User.email == email_address)).first()
+        if existing_user:
+            flash("Username or email already in use. Login instead?")
+            return redirect(url_for('signup'))
+
         hashed_password = generate_password_hash(password)
         new_user = User(username=user, email=email_address, password_hash=hashed_password)
-        db.session.add(new_user)
-        db.session.commit()
-        return redirect(url_for('signin'))
+        
+        try:
+            db.session.add(new_user)
+            db.session.commit()
+            return redirect(url_for('signin'))
+        except Exception:
+            db.session.rollback()
+            flash("An error occurred during registration. Please try again.")
+            return redirect(url_for('signup'))
+
     return render_template('signup.html')
 
 @app.route('/signin', methods=['GET', 'POST'])
@@ -152,7 +165,6 @@ def signin():
     if request.method == 'POST':
         login_identifier = request.form.get('username or email')
         pwd = request.form.get('password')
-        # Allow login via either username or email for better UX
         record = User.query.filter(or_(User.username == login_identifier, User.email == login_identifier)).first()
         if record and check_password_hash(record.password_hash, pwd):
             session['user_id'] = record.user_id
@@ -172,7 +184,6 @@ def logout():
 def dashboard():
     user_id = session['user_id']
     user = db.session.get(User, user_id)
-
     owned_subs = Subject.query.filter_by(user_id=user_id).all()
     
     others_memberships = SubjectMember.query.filter(
@@ -180,18 +191,21 @@ def dashboard():
         SubjectMember.status == 'accepted'
     ).all()
     shared_subs = [m.subject for m in others_memberships if m.subject.user_id != user_id]
+    
     all_subjects = owned_subs + shared_subs
     pending_invites = SubjectMember.query.filter_by(user_id=user_id, status='pending').all()
-    subject_data = []
+
+    subject_list = []
     for s in all_subjects:
         active_count = Task.query.filter_by(subject_id=s.subject_id).filter(Task.status_id != 2).count()
-        subject_data.append({
-            'info': s,
-            'active_tasks': active_count
+        subject_list.append({
+            'obj': s,
+            'active_count': active_count
         })
+    
     return render_template('home.html', 
                            username=user.username, 
-                           subjects=subject_data, 
+                           subjects=subject_list, 
                            invites=pending_invites)
 
 @app.route('/add_subject', methods=['GET', 'POST'])
