@@ -70,8 +70,10 @@ body {
 .flash {
     color: #ff6b4a;
     padding: 0.75rem;
-    font-size: 0.9rem;
+    font-size: 3rem;
     text-align: center;
+    padding-bottom: 1.5rem;
+    margin-top: -1rem;
 }
 .task_header {
     display: flex;
@@ -178,15 +180,6 @@ body {
     background: #fff5f2;
     color: #ff6b4a;
     border: 0.063rem solid #ffeadb;
-}
-.flash_message {
-    background-color: #fff5f2;
-    color: #ff6b4a;
-    border: 1px solid #ffeadb;
-    padding: 0.75rem;
-    border-radius: 0.5rem;
-    font-size: 0.9rem;
-    text-align: center;
 }
 .btn_complete {
     background: #f0f0f0;

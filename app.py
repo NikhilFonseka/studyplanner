@@ -290,7 +290,7 @@ def log_session(subject_id):
     # Simple validation for study time
     duration_raw = request.form.get('duration')
     if not duration_raw or not duration_raw.isdigit() or int(duration_raw) <= 0:
-        flash("Please enter valid positive minutes.")
+        flash("Can't log 0 minutes.")
     else:
         new_session = StudySession(duration=int(duration_raw), subject_id=subject_id)
         db.session.add(new_session)
