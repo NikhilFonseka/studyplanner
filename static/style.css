@@ -4,7 +4,7 @@
 
 body { 
     background-color: #ffffff; 
-    font-family: 'Helvetica'; 
+    font-family: "Arial", Helvetica, sans-serif; 
     margin: 0; 
     min-height: 100vh;
     color: #333;
@@ -71,6 +71,11 @@ body {
     padding-bottom: 1.5rem;
     margin-top: -1rem;
 }
+.task_description{
+    margin: 0.313rem 0;
+    font-size: 0.85rem; 
+    color: #666;
+    }
 .task_header {
     display: flex;
     gap: 0.5rem; 
@@ -151,7 +156,6 @@ body {
     margin-bottom: 1.875rem; 
     border: 0.063rem solid #ff6b4a; 
     padding: 0.938rem; 
-    border: 0.625rem;
 }
 .btn_tiny {
     padding: 0.313rem 0.625rem; 
@@ -185,16 +189,8 @@ body {
     text-decoration: line-through;
     color: #aaa;
 }
-.flex_row {
-    margin-top: 2rem;
-    gap: 1.5rem
-}
 
-.back_link {
-    display: inline-block;
-    padding: 0.625rem 0;
-    vertical-align: middle;
-}
+
 .back_link { text-decoration: none; color: #666; font-size: 0.875rem; }
 .delete_link { color: #ff4a4a; text-decoration: none; font-size: 2rem; margin-left: -20.25rem; padding-top: 10rem;}
 
@@ -228,7 +224,7 @@ body {
     text-decoration: none;
     color: #ff4a4a; 
     font-weight: 500;
-    font-size: 1.2rem;
+    font-size: 2rem;
 }
 .sidebar_links {
     list-style: none;
@@ -250,14 +246,6 @@ body {
 }
 
 
-body { 
-    background-color: #ffffff; 
-    font-family: 'Helvetica'; 
-    margin: 0; 
-    min-height: 100vh;
-    color: #333;
-}
-
 .app_layout {
     display: flex;
     min-height: 100vh;
@@ -267,7 +255,7 @@ body {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    align-items: center; /* This centers your Signup/Login forms */
+    align-items: center; 
     padding: 2rem;
 }
 .main_content .brand_title {

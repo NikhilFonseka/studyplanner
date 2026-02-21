@@ -65,6 +65,7 @@ class Task(db.Model):
     subject_id = db.Column(db.Integer, db.ForeignKey('subject.subject_id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=False)
     tags = db.relationship('Tag', secondary=task_tags, backref=db.backref('tasks', lazy='dynamic'))
+    priority = db.relationship('Priority', backref='tasks')
 #Logs study sessions
 class StudySession(db.Model):
     """Logs actual study time."""

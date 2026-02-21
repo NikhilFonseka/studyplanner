@@ -15,7 +15,6 @@ tasks_bp = Blueprint('tasks', __name__)
 def add_task():
     """Adds a new task to a specific subject with optional tags and priorities."""
     user_id = session['user_id']
-    # Filter subjects to only show the ones they actually belong to
     memberships = SubjectMember.query.filter_by(user_id=user_id, status='accepted').all()
     user_subjects = [m.subject for m in memberships]
 
@@ -23,7 +22,6 @@ def add_task():
     available_priorities = Priority.query.order_by(Priority.weight.asc()).all()
     
     if request.method == 'POST':
-        # due_date = None handles empty strings here via parse_date
         due_date = parse_date(request.form.get('due_date_str'))
         new_task = Task(
             title=request.form.get('title'),
@@ -33,10 +31,13 @@ def add_task():
             user_id=user_id,
             priority_id=request.form.get('priority_id')
         )
-        # Link up the many to many tags
         for t_id in request.form.getlist('tag_ids'):
-            tag_obj = db.session.get(Tag, t_id)
-            if tag_obj: new_task.tags.append(tag_obj)
+            try:
+                tag_obj = db.session.get(Tag, int(t_id)) 
+                if tag_obj:
+                    new_task.tags.append(tag_obj)
+            except (ValueError, TypeError):
+                continue
             
         db.session.add(new_task)
         db.session.commit()
