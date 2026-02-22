@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {# Block title allows child templates to set their own page titles (e.g., Signup | W Notes+) #}
     <title>{% block title %}W Notes+{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div class="app_layout">
         
-        {# Only show sidebar if the user is authenticated #}
+        {# Sidebar only rendered if a user is logged in (session exists) #}
         {% if session.get('user_id') %}
         <nav class="sidebar">
             <div class="sidebar_header">
@@ -17,6 +18,7 @@
             </div>
             
             <ul class="sidebar_links">
+                {# Navigation links #}
                 <li><a href="{{ url_for('main.dashboard') }}">dashboard</a></li>
                 <li><a href="{{ url_for('tasks.add_task') }}">new task</a></li>
                 <li><a href="{{ url_for('main.add_subject') }}">new subject</a></li>
@@ -28,10 +30,9 @@
         </nav>
         {% endif %}
 
-        {# The 'main_content' class in your CSS handles the centering #}
         <main class="main_content">
             
-            {# Flash messages section #}
+            {# Flash messages handled here #}
             {% with messages = get_flashed_messages() %}
               {% if messages %}
                 <div class="flash_container">
@@ -41,6 +42,8 @@
                 </div>
               {% endif %}
             {% endwith %}
+
+            {# Html goes here #}
             {% block content %}{% endblock %}
             
         </main>

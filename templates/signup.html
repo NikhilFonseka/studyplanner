@@ -2,16 +2,27 @@
 {% block title %}register{% endblock %}
 
 {% block content %}
+    {# brand_title class defined in style.css for consistent logo styling #}
     <h1 class="brand_title">W Notes+</h1>
     <h2 class="view_title">signup</h2>
 
     <div style="width: 300px;">
+        {# Form sends data to signup route using POST#}
         <form action="{{ url_for('auth.signup') }}" method="POST">
+            {# Standardized input_field class used across all form templates #}
             <input type="text" name="username" placeholder="username" class="input_field" required>
+            
+            {# Email type used for basic browser validation #}
             <input type="email" name="email" placeholder="email" class="input_field" required>
+            
+            {# Password type masks characters during entry #}
             <input type="password" name="password" placeholder="password" class="input_field" required>
+            
             <button type="submit" class="button_signup" style="width: 100%;">create account</button>
         </form>
+
+        {# allows already registered user to sign in instead.
+            Nielsen heuristic 3 user control and freedom#}
         <p style="font-size: 0.8em; margin-top: 20px; text-align: center;">
             <a href="{{ url_for('auth.signin') }}" style="color: #888; text-decoration: none;">already registered? login</a>
         </p>

@@ -23,10 +23,16 @@ app.register_blueprint(auth_bp)
 app.register_blueprint(main_bp)
 app.register_blueprint(tasks_bp)
 
+# Error handlers visiblity of system status
 @app.errorhandler(404)
 def page_not_found(e):
-    """Custom 404 error page for better user experience."""
+    """404 error page. Visiblity of system status."""
     return render_template('error.html', code=404, message="404 page not found"), 404
+
+@app.errorhandler(500)
+def server_error(e):
+    """505 error page visiblity of system status."""
+    return render_template('error.html', code=500, message="internal glitch", description="Something went wrong on our end. We're looking into it."), 500
 
 if __name__ == '__main__':
     with app.app_context():

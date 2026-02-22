@@ -1,14 +1,21 @@
 {% extends "base.html" %}
 
 {% block content %}
+{# This container centers the error message both vertically and horizontally #}
 <div class="form_container align_center" style="text-align: center; margin-top: 5rem;">
+    
+    {# Large display for the error code #}
     <h1 class="brand_title" style="font-size: 5rem;">{{ code }}</h1>
+    
+    {# what went wrong#}
     <h2 class="view_title">{{ message }}</h2>
     
+    {# A longer description of what went wrong #}
     <p class="history_text" style="margin-bottom: 2rem;">
         {{ description }}
     </p>
 
+    {# take the user back to their dashboard if not signed signed in auto redirects to sign up due to login required decorator #}
     <a href="{{ url_for('main.dashboard') }}" class="button_signup">Go back to site</a>
 </div>
 {% endblock %}

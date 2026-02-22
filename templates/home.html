@@ -4,6 +4,8 @@
     <h1 class="brand_title">W notes+</h1>
     <h2 class="view_title">welcome, {{ username }}</h2>
 
+    {# showing subject invites
+        only appears if there are pending invites in SubjectMember #}
     {% if invites %}
     <div class="form_container invite_section_border">
         <h3 class="section_subtitle accent_text">pending invites</h3>
@@ -11,6 +13,7 @@
             <div class="message_box flex_row space_between align_center">
                 <span>join <strong>{{ invite.subject.name|lower }}</strong>?</span>
                 <div>
+                    {# Links to the accept_invite route to update membership #}
                     <a href="{{ url_for('main.accept_invite', membership_id=invite.id) }}" class="button_signup btn_tiny">accept</a>
                 </div>
             </div>
@@ -18,20 +21,23 @@
     </div>
     {% endif %}
 
+    {# Displays cards for every subject the user owns or has joined #}
     <div class="dashboard_grid">
         {% for s in subjects %}
-        {# Updated to main blueprint #}
+        {# subject_id is used to route the user to the specific workspace in view_subject #}
         <a href="{{ url_for('main.view_subject', subject_id=s.obj.subject_id) }}" 
            class="subject_card" 
+           {# Inline CSS variable pulls the hex_code from the Color lookup table #}
            style="--subject-color: {{ s.obj.color.hex_code if s.obj.color else '#444' }};">
             <h3 class="subject_card_title">{{ s.obj.name|lower }}</h3>
+            
+            {# number of tasks per subject #}
             <p class="history_text">{{ s.active_count }} active tasks</p>
         </a>
         {% endfor %}
     </div>
 
     <div class="flex_row" style="margin-top: 1.5rem; gap: 1.5rem; margin-bottom: 1rem;">
-        {# Updated to main blueprint #}
         <a href="{{ url_for('main.add_subject') }}" class="secondary_link">+ add subject</a>
     </div>
 {% endblock %}

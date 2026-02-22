@@ -9,15 +9,18 @@
             
             <div class="scroll_area feed_height">
                 {% for task in tasks %}
+                    {# 2NF: Task status determines if the 'task_completed' CSS class is applied #}
                     <div class="task_item {% if task.status_id == 2 %}task_completed{% endif %}">
                         <div class="flex_row space_between align_center">
                             <span class="task_title">{{ task.title|lower }}</span>
                             
                             <div class="flex_row align_center">
+                                {# Priority label pulled from lookup table #}
                                 {% if task.priority %}
                                     <span class="priority_badge">{{ task.priority.level|lower }}</span>
                                 {% endif %}
                                 
+                                {# Logic to show 'Done' button only if task is still pending #}
                                 {% if task.status_id != 2 %}
                                     <a href="{{ url_for('tasks.complete_task', task_id=task.task_id) }}" class="btn_complete">done</a>
                                 {% else %}
@@ -32,6 +35,7 @@
                         </div>
                         {% endif %}
 
+                        {# Many-to-Many: Iterate through tags linked to this specific task #}
                         <div class="tags_container">
                             {% for t in task.tags %}
                                 <span class="tag_badge">{{ t.name|lower }}</span>
@@ -59,12 +63,14 @@
                 {% endfor %}
             </div>
 
+            {# Create note #}
             <form action="{{ url_for('main.send_message', subject_id=subject.subject_id) }}" method="POST" class="bottom_margin_20">
-                <input type="text" name="content" placeholder="enter notes here" class="input_field full_width" required>
+                <textarea name="content" placeholder="enter notes" class="input_field" rows="5" maxlength="50"></textarea>
             </form>
 
             <h3 class="section_subtitle">history</h3>
             <div class="scroll_area history_height">
+                {# study logs#}
                 {% for s in subject.study_sessions|sort(attribute='start_time', reverse=True) %}
                     <div class="history_text_item">
                         {{ s.duration }}m — {{ s.start_time.strftime('%b %d, %I:%M %p') }}
@@ -74,6 +80,7 @@
                 {% endfor %}
             </div>
 
+            {# Study Session logger targeting the specific subject_id #}
             <form action="{{ url_for('main.log_session', subject_id=subject.subject_id) }}" method="POST" class="flex_row bottom_margin_25">
                 <input type="number" name="duration" placeholder="mins" min="0" required class="short_input">
                 <button type="submit" class="button_signup btn_small">log</button>
@@ -86,6 +93,7 @@
             </form>
 
             <div style="margin-top: auto;">
+                {# Only display the delete link if the user is the original creator #}
                 {% if subject.user_id == session['user_id'] %}
                     <a href="{{ url_for('main.delete_subject', subject_id=subject.subject_id) }}" 
                     class="delete_link" 

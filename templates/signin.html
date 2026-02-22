@@ -2,15 +2,23 @@
 {% block title %}login{% endblock %}
 
 {% block content %}
+    {# brand_title is the shared CSS class for the W Notes+ logo #}
     <h1 class="brand_title">W Notes+</h1>
     <h2 class="view_title">login</h2>
 
     <div style="width: 300px;">
+        {# Form sends credentials to sign in route #}
         <form action="{{ url_for('auth.signin') }}" method="POST">
+            {# The sees if username or email linked to a user #}
             <input type="text" name="username or email" placeholder="username or email" class="input_field" required>
+            
             <input type="password" name="password" placeholder="password" class="input_field" required>
+            
             <button type="submit" class="button_signup" style="width: 100%;">enter</button>
         </form>
+
+        {# allows user to sign up instead.
+            Nielsen heuristic 3 user control and freedom#}
         <p style="font-size: 0.8em; margin-top: 20px; text-align: center;">
             <a href="{{ url_for('auth.signup') }}" style="color: #888; text-decoration: none;">need an account? signup</a>
         </p>

@@ -4,14 +4,18 @@
 <div class="form_container lowercase">
     <h1 class="brand_title">new subject</h1>
     
+    {# Form routes to add_subject #}
     <form method="POST">
         <label class="field_label">subject name</label>
+        {# Name of subject#}
         <input type="text" name="name" class="input_field" placeholder="e.g. biology" required>
         
         <label class="field_label">theme color</label>
+        {# dropdown is populated from the Color lookup table for 2nf #}
         <select name="color_id" class="input_field" required>
             <option value="" disabled selected>select color</option>
             {% for color in colors %}
+                {# color.id is stored in the Subject table as a foreign key #}
                 <option value="{{ color.id }}">{{ color.name }}</option>
             {% endfor %}
         </select>

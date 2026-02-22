@@ -4,12 +4,15 @@
     <h2 class="view_title">new task</h2>
 
     <div class="form_container">
+        {# sends tasks data to add task route#}
         <form action="{{ url_for('tasks.add_task') }}" method="POST">
             <input type="text" name="title" placeholder="task name" class="input_field" required>
             
+            {# Description only 40 characters to prevent breaking dashboard #}
             <textarea name="description" placeholder="task description (40 characters max)" class="input_field" rows="3" maxlength="40" style="resize: vertical;"></textarea>
             
             <div class="flex_row" style="margin-bottom: 0.938rem;">
+                {# 2NF: Fetches levels (High, Normal, Low) from the Priority lookup table #}
                 <select name="priority_id" class="input_field flex_grow" style="margin-bottom: 0;" required>
                     <option value="" disabled selected>priority...</option>
                     {% for p in priorities %}
@@ -20,6 +23,7 @@
             </div>
 
             <p class="field_label">select tags:</p>
+            {# Many-to-Many: Allows user to check multiple boxes to populate the task_tags junction table #}
             <div class="checkbox_group">
                 {% for t in tags %}
                 <label class="checkbox_item">
@@ -28,14 +32,18 @@
                 </label>
                 {% endfor %}
             </div>
+
             <p class="field_label">select subject:</p>
+            {# Logic: Only shows subjects where the user is a confirmed member #}
             <select name="subject_id" class="input_field">
                 {% for s in subjects %}
                     <option value="{{ s.subject_id }}">{{ s.name|lower }}</option>
                 {% endfor %}
             </select>
             
+            {# Date input for the deadline; parsed in tasks.py via utils.parse_date #}
             <input type="date" name="due_date_str" class="input_field">
+            
             <button type="submit" class="button_signup full_width_btn">save task</button>
         </form>
     </div>
