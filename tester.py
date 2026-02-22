@@ -47,7 +47,6 @@ def test_404_not_found(client):
     rv = client.get('/subject/9999')
     assert rv.status_code == 404
 
-
 def test_task_priority_integration(client):
     """Verifies 2NF/3NF logic: Tasks must link correctly to the Priority lookup table."""
     client.post('/signin', data={'username or email': 'testuser', 'password': 'password123'})
@@ -72,7 +71,7 @@ def test_task_priority_integration(client):
         assert task.priority.weight == 1 
 
 def test_task_due_date_error_handling(client):
-    """Ensures the utility parse_date function handles invalid strings as None."""
+    """Ensures the invalid dates are handled properly."""
     client.post('/signin', data={'username or email': 'testuser', 'password': 'password123'})
     client.post('/add_subject', data={'name': 'Math', 'color_id': 1})
     client.post('/add_task', data={
@@ -119,7 +118,7 @@ def test_message_privacy(client):
     assert b"access denied" in rv.data.lower()
 
 def test_subject_invite_flow(client):
-    """Tests the full collaboration lifecycle: Invite -> Pending -> Accepted."""
+    """Test if invite systen works as intended."""
     #Setup: User 1 creates subject, User 2 signs up
     client.post('/signin', data={'username or email': 'testuser', 'password': 'password123'})
     client.post('/add_subject', data={'name': 'Group Project', 'color_id': 1})
@@ -148,7 +147,7 @@ def test_subject_invite_flow(client):
     assert b"active tasks" in rv_after.data 
 
 def test_subject_deletion_cascade(client):
-    """Verifies that deleting a subject also cleans up membership records (Integrity check)."""
+    """Verifies that deleting a subject also cleans up membership records/cascading deletes."""
     client.post('/signin', data={'username or email': 'testuser', 'password': 'password123'})
     client.post('/add_subject', data={'name': 'DeleteMe', 'color_id': 1})
     
