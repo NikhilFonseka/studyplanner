@@ -25,6 +25,7 @@ def signup():
             flash("Username or email already in use. Login instead?")
             return redirect(url_for('auth.signup'))
 
+        # Securely hash password before storing in the DB
         hashed_password = generate_password_hash(password)
         new_user = User(username=user, email=email_address, password_hash=hashed_password)
         
@@ -33,6 +34,7 @@ def signup():
             db.session.commit()
             return redirect(url_for('auth.signin'))
         except Exception:
+            # If the database grumbles, roll it back
             db.session.rollback()
             flash("An error occurred during registration. Please try again.")
             return redirect(url_for('auth.signup'))
@@ -44,8 +46,11 @@ def signin():
     if request.method == 'POST':
         login_identifier = request.form.get('username or email')
         pwd = request.form.get('password')
+        
+        # Search for user by either username OR email (SQLAlchemy or_ logic)
         record = User.query.filter(or_(User.username == login_identifier, User.email == login_identifier)).first()
         
+        # Check if password matches the hash we have on file
         if record and check_password_hash(record.password_hash, pwd):
             session['user_id'] = record.user_id
             return redirect(url_for('main.dashboard'))

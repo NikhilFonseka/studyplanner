@@ -15,6 +15,7 @@ tasks_bp = Blueprint('tasks', __name__)
 def add_task():
     """Adds a new task to a specific subject with optional tags and priorities."""
     user_id = session['user_id']
+    # Filter only subjects user is actually a member of
     memberships = SubjectMember.query.filter_by(user_id=user_id, status='accepted').all()
     user_subjects = [m.subject for m in memberships]
 
@@ -22,6 +23,7 @@ def add_task():
     available_priorities = Priority.query.order_by(Priority.weight.asc()).all()
     
     if request.method == 'POST':
+        # parse_date handles invalid strings from the date input
         due_date = parse_date(request.form.get('due_date_str'))
         new_task = Task(
             title=request.form.get('title'),
@@ -31,6 +33,8 @@ def add_task():
             user_id=user_id,
             priority_id=request.form.get('priority_id')
         )
+        
+        # Link Many-to-Many tags safely
         for t_id in request.form.getlist('tag_ids'):
             try:
                 tag_obj = db.session.get(Tag, int(t_id)) 
@@ -44,16 +48,19 @@ def add_task():
         return redirect(url_for('main.view_subject', subject_id=new_task.subject_id))
         
     return render_template('addtask.html', subjects=user_subjects, tags=available_tags, priorities=available_priorities)
+
 # marks tasks as complete
 @tasks_bp.route('/complete_task/<int:task_id>')
 @login_required
 def complete_task(task_id):
     """Marks a task as completed."""
     task = db.session.get(Task, task_id) or abort(404)
+    
+    # logic to ensure the user owns the task before marking done
     if task.user_id != session['user_id']:
         flash("Permission denied.")
         return redirect(url_for('main.dashboard'))
 
-    task.status_id = 2
+    task.status_id = 2 # Updates linked 2NF status
     db.session.commit()
     return redirect(url_for('main.view_subject', subject_id=task.subject_id))
