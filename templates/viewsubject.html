@@ -65,7 +65,7 @@
 
             {# Create note #}
             <form action="{{ url_for('main.send_message', subject_id=subject.subject_id) }}" method="POST" class="bottom_margin_20">
-                <input type="text" name="content" placeholder="enter notes here" class="input_field full_width" required>
+                <input type="text" name="content" placeholder="enter notes here (max 50 lines)" maxlength="50" class="input_field full_width" required>
             </form>
 
             <h3 class="section_subtitle">history</h3>
