@@ -42,13 +42,13 @@ def test_unauthorized_access(client):
     assert b"sign in" in rv.data.lower()
 
 def test_404_not_found(client):
-    """Confirms the custom error handler triggers for non-existent records."""
+    """Confirms the 404 triggers for non existant pages"""
     client.post('/signin', data={'username or email': 'testuser', 'password': 'password123'})
     rv = client.get('/subject/9999')
     assert rv.status_code == 404
 
 def test_task_priority_integration(client):
-    """Verifies 2NF/3NF logic: Tasks must link correctly to the Priority lookup table."""
+    """Tasks must link correctly to the Priority lookup table."""
     client.post('/signin', data={'username or email': 'testuser', 'password': 'password123'})
     client.post('/add_subject', data={'name': 'Math', 'color_id': 1})
     
