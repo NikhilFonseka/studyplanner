@@ -15,6 +15,10 @@
                             <span class="task_title">{{ task.title|lower }}</span>
                             
                             <div class="flex_row align_center">
+                            {# Display Due Date if it exists #}
+                                {% if task.due_date %}
+                                    <span class="due_date_badge">due: {{ task.due_date.strftime('%b %d') }}</span>
+                                {% endif %}
                                 {# Priority label pulled from lookup table #}
                                 {% if task.priority %}
                                     <span class="priority_badge">{{ task.priority.level|lower }}</span>
