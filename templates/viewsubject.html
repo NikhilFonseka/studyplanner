@@ -65,15 +65,15 @@
 
             {# Create note #}
             <form action="{{ url_for('main.send_message', subject_id=subject.subject_id) }}" method="POST" class="bottom_margin_20">
-                <textarea name="content" placeholder="enter notes" class="input_field" rows="5" maxlength="50"></textarea>
+                <input type="text" name="content" placeholder="enter notes here" class="input_field full_width" required>
             </form>
 
             <h3 class="section_subtitle">history</h3>
             <div class="scroll_area history_height">
-                {# study logs#}
-                {% for s in subject.study_sessions|sort(attribute='start_time', reverse=True) %}
+                {# study logs #}
+                {% for s in subject.study_sessions|sort(attribute='timestamp', reverse=True) %}
                     <div class="history_text_item">
-                        {{ s.duration }}m — {{ s.start_time.strftime('%b %d, %I:%M %p') }}
+                        {{ s.duration }}m — {{ s.timestamp.strftime('%b %d, %I:%M %p') }}
                     </div>
                 {% else %}
                     <p class="history_text">no sessions logged.</p>

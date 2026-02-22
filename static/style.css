@@ -15,7 +15,7 @@ body {
 .brand_title {
     color: #ff6b4a; 
     font-size: 3rem;
-    margin-top: 3.75rem;
+    margin-top: 0.35rem;
     margin-bottom: 0.625rem;
 }
 /* handles title for every screen */
@@ -42,6 +42,15 @@ body {
     max-width: 62.5rem;
     margin-top: 1.25rem;
 }
+
+.flash {
+    color: #e22900;
+    padding: 0.75rem;
+    font-size: 3rem;
+    text-align: center;
+    padding-bottom: 1.5rem;
+    margin-top: -1rem;
+}
 /* card for each subject */
 .subject_card {
     background-color: #ffffff;
@@ -52,6 +61,40 @@ body {
     /* needed to use --subject-color variable for color to update color to what ever user picks */
     border: 0.5rem solid var(--subject-color, #444);
     text-align: center;
+}
+.btn_complete {
+    font-size: 0.75rem;
+    color: #ff6b4a;
+    text-decoration: none;
+    border: 1px solid #ff6b4a;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+/* for task description text */
+.task_description {
+    font-size: 0.85rem;
+    color: #666;
+    margin: 5px 0;
+}
+
+.delete_link {
+    color: #cc0000;
+    font-size: 3rem;
+    text-decoration: none;
+    opacity: 0.7;
+    margin-left: -20.25rem;
+    padding-top: 10rem;
+    }
+
+
+/* for Message/Note boxes */
+.message_box {
+    background: #fff;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #eee;
+    font-size: 0.9rem;
 }
 
 /* Form Styles */
@@ -77,7 +120,6 @@ body {
     border: 0.375rem;
     font-size: 1rem;
     text-align: center;
-    cursor: pointer;
 }
 
 /* Splits the tasks and the notes/chat into two equal columns*/
@@ -130,6 +172,7 @@ body {
     border: 0.063rem solid #ffeadb;
 }
 
+
 /* Sidebar / Nav menu */
 .sidebar {
     width: 15rem;
@@ -142,7 +185,28 @@ body {
     top: 0;
     height: 100vh;
 }
+.sidebar_footer {
+    margin-top: auto; 
+    padding-top: 1rem;
+}
+.status_badge {
+    font-size: 0.688rem;
+    background: #e8f5e9;
+    font-weight: 600;
+}
+.secondary_link { 
+    color: #ff6b4a;
+    text-decoration: none;
+    display: block;
+    margin-top: 0.625rem; 
+}
 
+.logout_link {
+    text-decoration: none;
+    color: #ff4a4a; 
+    font-weight: 500;
+    font-size: 2rem;
+}
 .sidebar_links {
     list-style: none;
     padding: 0;
@@ -150,6 +214,9 @@ body {
     flex-grow: 1;
 }
 
+.sidebar_links li {
+    margin-bottom: 1rem;
+}
 .sidebar_links a {
     text-decoration: none;
     color: #444;
@@ -168,7 +235,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center; 
-    padding: 2rem;
+    padding: 1rem;
 }
 
 /* Helper Classes */
@@ -176,3 +243,9 @@ body {
 .space_between { justify-content: space-between; }
 .align_center { align-items: center; }
 .accent_text { color: #ff6b4a; }
+.bottom_margin_20 { margin-bottom: 20px; }
+.bottom_margin_25 { margin-bottom: 25px; }
+.no_margin { margin: 0; }
+.flex_grow { flex-grow: 1; }
+.btn_small { padding: 5px 15px; font-size: 0.8rem; }
+.short_input { width: 60px; padding: 5px; }
